@@ -141,6 +141,14 @@ static int am33xx_do_sram_idle(long unsigned int state)
 	return 0;
 }
 
+void am33xx_idle(void)
+{
+	pr_debug("%s @ %d\n", __func__, __LINE__);
+	am33xx_do_wfi_sram();
+	local_irq_enable();
+	pr_debug("%s @ %d\n", __func__, __LINE__);
+}
+
 static int am33xx_pm_suspend(void)
 {
 	int state, ret = 0;
@@ -560,8 +568,10 @@ static int __init am33xx_pm_init(void)
 		enable_deep_sleep = false;
 	}
 
-	if (enable_deep_sleep)
+	if (enable_deep_sleep) {
 		suspend_set_ops(&am33xx_pm_ops);
+		pm_idle = am33xx_idle;
+	}
 #endif /* CONFIG_SUSPEND */
 
 	return ret;

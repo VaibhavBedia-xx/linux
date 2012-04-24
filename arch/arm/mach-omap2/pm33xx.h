@@ -16,6 +16,8 @@
 #ifndef __ASSEMBLER__
 extern void __iomem *am33xx_get_ram_base(void);
 
+void am33xx_idle(void);
+
 struct a8_wkup_m3_ipc_data {
 	int resume_addr;
 	int sleep_mode;

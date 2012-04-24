@@ -30,9 +30,13 @@
 #include "cpuidle33xx.h"
 
 #define AM33XX_CPUIDLE_MAX_STATES	2
+extern void am33xx_idle(void);
 
 struct am33xx_ops {
+#if 0
 	void (*enter) (u32 flags);
+#endif
+	void (*enter) (void);
 	void (*exit) (u32 flags);
 	u32 flags;
 };
@@ -75,8 +79,11 @@ static void am33xx_c2state_exit(u32 flags)
 
 static struct am33xx_ops am33xx_states[AM33XX_CPUIDLE_MAX_STATES] = {
 	[1] = {
+		.enter	= am33xx_idle,
+#if 0
 		.enter	= am33xx_c2state_enter,
 		.exit	= am33xx_c2state_exit,
+#endif
 	},
 };
 
@@ -93,7 +100,10 @@ static int am33xx_enter_idle(struct cpuidle_device *dev,
 	do_gettimeofday(&before);
 
 	if (ops && ops->enter)
+#if 0
 		ops->enter(ops->flags);
+#endif
+		ops->enter();
 
 	/* Wait for interrupt state */
 	cpu_do_idle();

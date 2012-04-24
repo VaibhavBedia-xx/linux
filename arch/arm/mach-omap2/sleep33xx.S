@@ -92,7 +92,7 @@ wait_pll_lock_\name:
 wait_sr:
 	subs	r1, r1, #1
 	bne	wait_sr
-
+#if 0
 	/* Disable EMIF at this point */
 	ldr	r1, virt_emif_clkctrl
 	ldr	r2, [r1]
@@ -139,12 +139,13 @@ wait_emif_disable:
 	pll_bypass	disp, virt_disp_clk_mode, virt_disp_idlest
 	pll_bypass	per, virt_per_clk_mode, virt_per_idlest
 	pll_bypass	mpu, virt_mpu_clk_mode, virt_mpu_idlest
-
+#endif
 	dsb
 	dmb
 	isb
 
 	wfi
+#if 0
 	nop
 	nop
 	nop
@@ -223,7 +224,7 @@ wait_emif_enable:
 	ldr	r3, [r1]
 	cmp	r2, r3
 	bne	wait_emif_enable
-
+#endif
 	/* Disable EMIF self-refresh */
 	ldr	r0, emif_addr_virt
 	add	r0, r0, #EMIF4_0_SDRAM_MGMT_CTRL
@@ -233,7 +234,7 @@ wait_emif_enable:
 
 	mov	r0, #7
 	ldmfd	sp!, {r4 - r11, pc}	@ restore regs and return
-
+#if 0
 	nop
 	nop
 	nop
@@ -395,7 +396,7 @@ wait_loop2:
 	/* We are back. Branch to the common CPU resume routine */
 ENTRY(am33xx_resume_vector)
 	ldr	pc, resume_addr
-
+#endif
 /*
  * Local variables
  */
