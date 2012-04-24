@@ -504,7 +504,8 @@ static struct omap_hwmod am33xx_cpgmac0_hwmod = {
 	},
 	.slaves		= am33xx_cpgmac0_slaves,
 	.slaves_cnt	= ARRAY_SIZE(am33xx_cpgmac0_slaves),
-	.flags		= (HWMOD_SWSUP_SIDLE | HWMOD_SWSUP_MSTANDBY),
+	.flags		= (HWMOD_SWSUP_SIDLE | HWMOD_SWSUP_MSTANDBY |
+				HWMOD_INIT_NO_IDLE | HWMOD_INIT_NO_RESET),
 };
 
 /* 'dcan' class */
@@ -3368,13 +3369,11 @@ static __initdata struct omap_hwmod *am33xx_hwmods[] = {
 	&am33xx_spinlock_hwmod,
 	/* uart class */
 	&am33xx_uart1_hwmod,
-#if 0
 	&am33xx_uart2_hwmod,
 	&am33xx_uart3_hwmod,
 	&am33xx_uart4_hwmod,
 	&am33xx_uart5_hwmod,
 	&am33xx_uart6_hwmod,
-#endif
 	/* timer class */
 	&am33xx_timer0_hwmod,
 	&am33xx_timer1_hwmod,
