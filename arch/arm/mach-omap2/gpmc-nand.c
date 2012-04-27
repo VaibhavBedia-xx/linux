@@ -31,6 +31,9 @@ static struct platform_device gpmc_nand_device = {
 	.resource	= &gpmc_nand_resource,
 };
 
+
+GPMC_CONFIG1_WAIT_MON_TIME
+
 static int omap2_nand_gpmc_retime(struct omap_nand_platform_data *gpmc_nand_data)
 {
 	struct gpmc_timings t;

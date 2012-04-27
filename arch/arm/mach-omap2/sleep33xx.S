@@ -78,15 +78,16 @@ wait_pll_lock_\name:
 
 	add	r1, r0, #EMIF4_0_SDRAM_MGMT_CTRL
 	ldr	r2, [r1]
-	orr	r2, r2, #0xa0		@ a reasonable delay for entering SR
+	orr	r2, r2, #0xf0		@ a reasonable delay for entering SR
 	str	r2, [r1, #0]
+	str	r2, [r1, #4]
 
 	ldr	r2, ddr_start		@ do a dummy access to DDR
 	ldr	r3, [r2, #0]
 	ldr	r3, [r1, #0]
 	orr	r3, r3, #0x200		@ now set the LP MODE to Self-Refresh
 	str	r3, [r1, #0]
-	str	r2, [r1, #4]		@ write to shadow register also
+	str	r3, [r1, #4]		@ write to shadow register also
 
 	mov	r1, #0x1000		@ Give some time for the system to enter SR
 wait_sr:
@@ -229,7 +230,7 @@ wait_emif_enable:
 	ldr	r0, emif_addr_virt
 	add	r0, r0, #EMIF4_0_SDRAM_MGMT_CTRL
 	ldr	r1, [r0]
-	bic	r1, r1, #(0x7 << 7)
+	bic	r1, r1, #(0x7 << 8)
 	str	r1, [r0]
 
 	mov	r0, #7

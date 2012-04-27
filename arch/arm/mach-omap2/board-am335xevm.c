@@ -162,6 +162,7 @@ static struct lcd_ctrl_config lcd_cfg = {
 	.sync_edge		= 0,
 	.sync_ctrl		= 1,
 	.raster_order		= 0,
+	.fifo_th		= 512,
 };
 
 struct da8xx_lcdc_platform_data TFC_S9700RTWV35TR_01B_pdata = {
