@@ -17,6 +17,7 @@
 #include <linux/kernel.h>
 #include <linux/list.h>
 #include <linux/clk.h>
+#include <linux/io.h>
 
 #include "soc.h"
 #include "iomap.h"
