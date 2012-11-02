@@ -59,6 +59,14 @@ static inline int mbox_fifo_full(struct omap_mbox *mbox)
 {
 	return mbox->ops->fifo_full(mbox);
 }
+static inline int mbox_fifo_needs_flush(struct omap_mbox *mbox)
+{
+	return mbox->ops->fifo_needs_flush(mbox);
+}
+static inline mbox_msg_t mbox_fifo_readback(struct omap_mbox *mbox)
+{
+	return mbox->ops->fifo_readback(mbox);
+}
 
 /* Mailbox IRQ handle functions */
 static inline void ack_mbox_irq(struct omap_mbox *mbox, omap_mbox_irq_t irq)
@@ -115,6 +123,33 @@ out:
 	return ret;
 }
 EXPORT_SYMBOL(omap_mbox_msg_send);
+
+/*
+ * Flush the Rx FIFO by reading back the messages
+ * Since the normal expectation is that the Rx will do the
+ * reading, add a debug message to indicate if we really flush
+ *
+ * Returns the no. of messages read back
+ */
+int omap_mbox_msg_rx_flush(struct omap_mbox *mbox)
+{
+	int ret = 0;
+	mbox_msg_t msg;
+
+	while (mbox_fifo_needs_flush(mbox)) {
+		msg = mbox_fifo_readback(mbox);
+		ret++;
+	}
+
+	if (ret) {
+		/* no more messages in the fifo. clear IRQ source. */
+		ack_mbox_irq(mbox, IRQ_RX);
+		pr_debug("Flushed %s Rx FIFO by reading back\n", mbox->name);
+	}
+
+	return ret;
+}
+EXPORT_SYMBOL(omap_mbox_msg_rx_flush);
 
 static void mbox_tx_tasklet(unsigned long tx_data)
 {
