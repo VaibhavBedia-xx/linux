@@ -225,6 +225,7 @@ static int __init omap_dm_timer_init_one(struct omap_dm_timer *timer,
 	struct device_node *np;
 	struct omap_hwmod *oh;
 	struct resource irq, mem;
+	struct clk *src;
 	int r = 0;
 
 	if (of_have_populated_dt()) {
@@ -279,21 +280,18 @@ static int __init omap_dm_timer_init_one(struct omap_dm_timer *timer,
 	if (IS_ERR(timer->fclk))
 		return -ENODEV;
 
-	/* FIXME: Need to remove hard-coded test on timer ID */
-	if (gptimer_id != 12) {
-		struct clk *src;
+	src = clk_get(NULL, fck_source);
+	if (IS_ERR(src))
+		return -EINVAL;
 
-		src = clk_get(NULL, fck_source);
-		if (IS_ERR(src)) {
-			r = -EINVAL;
-		} else {
-			r = clk_set_parent(timer->fclk, src);
-			if (IS_ERR_VALUE(r))
-				pr_warn("%s: %s cannot set source\n",
-					__func__, oh->name);
-			clk_put(src);
-		}
+	if (clk_get_parent(timer->fclk) != src) {
+		r = clk_set_parent(timer->fclk, src);
+		if (IS_ERR_VALUE(r))
+			pr_warn("%s: %s cannot set source\n",
+				__func__, oh->name);
 	}
+
+	clk_put(src);
 
 	omap_hwmod_setup_one(*name);
 	omap_hwmod_enable(oh);
