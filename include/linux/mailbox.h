@@ -28,6 +28,7 @@ struct mailbox_msg {
 }
 
 int mailbox_msg_send(struct mailbox *, struct mailbox_msg *msg);
+int mailbox_msg_rx_flush(struct mailbox *mbox);
 struct mailbox_msg *mailbox_msg_send_receive_no_irq(struct mailbox *,
 		struct mailbox_msg *msg);
 int mailbox_msg_send_no_irq(struct mailbox *, struct mailbox_msg *msg);
