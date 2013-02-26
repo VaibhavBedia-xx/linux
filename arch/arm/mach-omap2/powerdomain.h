@@ -68,7 +68,7 @@
  * Maximum number of clockdomains that can be associated with a powerdomain.
  * PER powerdomain on AM33XX is the worst case
  */
-#define PWRDM_MAX_CLKDMS	11
+#define PWRDM_MAX_CLKDMS	20
 
 /* XXX A completely arbitrary number. What is reasonable here? */
 #define PWRDM_TRANSITION_BAILOUT 100000
@@ -251,6 +251,7 @@ extern int omap_set_pwrdm_state(struct powerdomain *pwrdm, u8 state);
 extern void omap242x_powerdomains_init(void);
 extern void omap243x_powerdomains_init(void);
 extern void omap3xxx_powerdomains_init(void);
+extern void ti81xx_powerdomains_init(void);
 extern void am33xx_powerdomains_init(void);
 extern void omap44xx_powerdomains_init(void);
 

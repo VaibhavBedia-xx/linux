@@ -272,6 +272,7 @@ static int __init omap_dm_timer_init_one(struct omap_dm_timer *timer,
 	if (!timer->io_base)
 		return -ENXIO;
 
+#if 0
 	/* After the dmtimer is using hwmod these clocks won't be needed */
 	timer->fclk = clk_get(NULL, omap_hwmod_get_main_clk(oh));
 	if (IS_ERR(timer->fclk))
@@ -289,7 +290,7 @@ static int __init omap_dm_timer_init_one(struct omap_dm_timer *timer,
 	}
 
 	clk_put(src);
-
+#endif
 	omap_hwmod_setup_one(*name);
 	omap_hwmod_enable(oh);
 	__omap_dm_timer_init_regs(timer);
@@ -301,7 +302,10 @@ static int __init omap_dm_timer_init_one(struct omap_dm_timer *timer,
 	if (posted != timer->posted)
 		return -EINVAL;
 
+	timer->rate = 27000000;
+#if 0
 	timer->rate = clk_get_rate(timer->fclk);
+#endif
 	timer->reserved = 1;
 
 	return r;
@@ -577,7 +581,7 @@ OMAP_SYS_32K_TIMER_INIT(3_secure, 12, "secure_32k_fck", "ti,timer-secure",
 			2, "timer_sys_ck", NULL);
 #endif /* CONFIG_ARCH_OMAP3 */
 
-#if defined(CONFIG_ARCH_OMAP3) || defined(CONFIG_SOC_AM33XX)
+#if defined(CONFIG_ARCH_OMAP3) || defined(CONFIG_SOC_AM33XX) || defined(CONFIG_SOC_TI81XX)
 OMAP_SYS_GP_TIMER_INIT(3, 2, "timer_sys_ck", NULL,
 		       1, "timer_sys_ck", "ti,timer-alwon");
 #endif

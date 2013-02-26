@@ -132,6 +132,9 @@ config SOC_TI81XX
 	bool "TI81XX support"
 	depends on ARCH_OMAP3
 	default y
+	select CPU_V7
+	select MULTI_IRQ_HANDLER
+	select COMMON_CLK
 
 config SOC_AM33XX
 	bool "AM33XX support"
@@ -365,11 +368,6 @@ config MACH_OMAP_3630SDP
 	depends on ARCH_OMAP3
 	default y
 	select OMAP_PACKAGE_CBP
-
-config MACH_TI8168EVM
-	bool "TI8168 Evaluation Module"
-	depends on SOC_TI81XX
-	default y
 
 config MACH_TI8148EVM
 	bool "TI8148 Evaluation Module"

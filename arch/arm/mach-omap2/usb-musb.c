@@ -91,7 +91,7 @@ void __init usb_musb_init(struct omap_musb_board_data *musb_board_data)
 	if (soc_is_am35xx()) {
 		oh_name = "am35x_otg_hs";
 		name = "musb-am35x";
-	} else if (cpu_is_ti81xx()) {
+	} else if (soc_is_ti81xx()) {
 		oh_name = "usb_otg_hs";
 		name = "musb-ti81xx";
 	} else {

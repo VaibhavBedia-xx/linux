@@ -495,12 +495,20 @@ void __init ti81xx_init_early(void)
 	omap2_set_globals_cm(OMAP2_L4_IO_ADDRESS(TI81XX_PRCM_BASE), NULL);
 	omap3xxx_check_revision();
 	ti81xx_check_features();
+	ti81xx_voltagedomains_init();
+	ti81xx_powerdomains_init();
+	ti81xx_clockdomains_init();
+	ti81xx_hwmod_init();
+	omap_hwmod_init_postsetup();
+	ti81xx_clk_init();
+#if 0
 	omap3xxx_voltagedomains_init();
 	omap3xxx_powerdomains_init();
 	omap3xxx_clockdomains_init();
 	omap3xxx_hwmod_init();
 	omap_hwmod_init_postsetup();
 	omap3xxx_clk_init();
+#endif
 }
 
 void __init omap3_init_late(void)
@@ -545,10 +553,12 @@ void __init am35xx_init_late(void)
 
 void __init ti81xx_init_late(void)
 {
+#if 0
 	omap_mux_late_init();
 	omap2_common_pm_late_init();
 	omap3_pm_init();
 	omap2_clk_enable_autoidle_all();
+#endif
 }
 #endif
 

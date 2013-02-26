@@ -96,6 +96,15 @@
 # endif
 #endif
 
+#ifdef CONFIG_SOC_TI81XX
+# ifdef OMAP_NAME
+#  undef  MULTI_OMAP2
+#  define MULTI_OMAP2
+# else
+#  define OMAP_NAME ti81xx
+# endif
+#endif
+
 /*
  * Omap device type i.e. EMU/HS/TST/GP/BAD
  */
@@ -187,7 +196,6 @@ IS_OMAP_CLASS(44xx, 0x44)
 IS_AM_CLASS(35xx, 0x35)
 IS_OMAP_CLASS(54xx, 0x54)
 IS_AM_CLASS(33xx, 0x33)
-
 IS_TI_CLASS(81xx, 0x81)
 
 IS_OMAP_SUBCLASS(242x, 0x242)
@@ -208,12 +216,17 @@ IS_AM_SUBCLASS(335x, 0x335)
 #define cpu_is_omap243x()		0
 #define cpu_is_omap34xx()		0
 #define cpu_is_omap343x()		0
+#if 0
 #define cpu_is_ti81xx()			0
 #define cpu_is_ti816x()			0
 #define cpu_is_ti814x()			0
+#endif
 #define soc_is_am35xx()			0
 #define soc_is_am33xx()			0
 #define soc_is_am335x()			0
+#define soc_is_ti81xx()			0
+#define soc_is_ti816x()			0
+#define soc_is_ti814x()			0
 #define cpu_is_omap44xx()		0
 #define cpu_is_omap443x()		0
 #define cpu_is_omap446x()		0
@@ -321,16 +334,20 @@ IS_OMAP_TYPE(3430, 0x3430)
 
 #if defined(CONFIG_ARCH_OMAP3)
 # undef cpu_is_omap3430
+#if 0
 # undef cpu_is_ti81xx
 # undef cpu_is_ti816x
 # undef cpu_is_ti814x
+#endif
 # undef soc_is_am35xx
 # define cpu_is_omap3430()		is_omap3430()
 # undef cpu_is_omap3630
 # define cpu_is_omap3630()		is_omap363x()
+#if 0
 # define cpu_is_ti81xx()		is_ti81xx()
 # define cpu_is_ti816x()		is_ti816x()
 # define cpu_is_ti814x()		is_ti814x()
+#endif
 # define soc_is_am35xx()		is_am35xx()
 #endif
 
@@ -339,6 +356,13 @@ IS_OMAP_TYPE(3430, 0x3430)
 # undef soc_is_am335x
 # define soc_is_am33xx()		is_am33xx()
 # define soc_is_am335x()		is_am335x()
+#endif
+
+# if defined(CONFIG_SOC_TI81XX)
+# undef soc_is_ti81xx
+# undef soc_is_ti816x
+# define soc_is_ti81xx()		is_ti81xx()
+# define soc_is_ti816x()		is_ti816x()
 #endif
 
 # if defined(CONFIG_ARCH_OMAP4)

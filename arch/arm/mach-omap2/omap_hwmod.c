@@ -138,6 +138,7 @@
 #include <linux/spinlock.h>
 #include <linux/slab.h>
 #include <linux/bootmem.h>
+#include <linux/of.h>
 
 #include <asm/system_misc.h>
 
@@ -2361,7 +2362,11 @@ static int _shutdown(struct omap_hwmod *oh)
 static void __init _init_mpu_rt_base(struct omap_hwmod *oh, void *data)
 {
 	struct omap_hwmod_addr_space *mem;
-	void __iomem *va_start;
+	void __iomem *va_start = NULL;
+	struct device_node *np;
+	unsigned long start = 0, size = 0;
+	const void *reg_prop;
+	const char *p;
 
 	if (!oh)
 		return;
@@ -2373,12 +2378,28 @@ static void __init _init_mpu_rt_base(struct omap_hwmod *oh, void *data)
 
 	mem = _find_mpu_rt_addr_space(oh);
 	if (!mem) {
-		pr_debug("omap_hwmod: %s: no MPU register target found\n",
-			 oh->name);
-		return;
+		pr_debug("omap_hwmod: %s: no MPU register target found\n", oh->name);
+		/* check in DT blob */
+		for_each_child_of_node(of_find_node_by_name(NULL, "ocp"), np) {
+			pr_debug("omap_hwmod: %d np-name=%s\n", __LINE__, np->name);
+			if (of_find_property(np, "ti,hwmods", NULL)) {
+				p = of_get_property(np, "ti,hwmods", NULL);
+				if (!strcmp(p, oh->name)) {
+					reg_prop = of_get_property(np, "reg", NULL);
+					start = of_read_number(reg_prop, 1);
+					size = of_read_number(reg_prop + 4, 1);
+				}
+			}
+		}
+	} else {
+		start = mem->pa_start;
+		size = mem->pa_end - mem->pa_start;
 	}
 
-	va_start = ioremap(mem->pa_start, mem->pa_end - mem->pa_start);
+	if (!start)
+		return;
+
+	va_start = ioremap(start, size);
 	if (!va_start) {
 		pr_err("omap_hwmod: %s: Could not ioremap\n", oh->name);
 		return;
@@ -4142,7 +4163,8 @@ void __init omap_hwmod_init(void)
 		soc_ops.init_clkdm = _init_clkdm;
 		soc_ops.update_context_lost = _omap4_update_context_lost;
 		soc_ops.get_context_lost = _omap4_get_context_lost;
-	} else if (soc_is_am33xx()) {
+	} else if (soc_is_am33xx() || soc_is_ti81xx()) {
+	printk("%s @ %d\n", __func__, __LINE__);
 		soc_ops.enable_module = _am33xx_enable_module;
 		soc_ops.disable_module = _am33xx_disable_module;
 		soc_ops.wait_target_ready = _am33xx_wait_target_ready;

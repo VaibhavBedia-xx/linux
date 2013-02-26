@@ -144,6 +144,27 @@ DT_MACHINE_START(AM33XX_DT, "Generic AM33XX (Flattened Device Tree)")
 MACHINE_END
 #endif
 
+#ifdef CONFIG_SOC_TI81XX
+static const char *ti81xx_boards_compat[] __initdata = {
+	"ti,ti81xx",
+	NULL,
+};
+
+DT_MACHINE_START(TI81XX_DT, "Generic TI81XX (Flattened Device Tree)")
+	.reserve	= omap_reserve,
+	.map_io		= ti81xx_map_io,
+	.init_early	= ti81xx_init_early,
+	.init_irq	= omap_intc_of_init,
+	.handle_irq	= omap3_intc_handle_irq,
+	.init_machine	= omap_generic_init,
+	.init_time	= omap3_gptimer_timer_init,
+	.dt_compat	= ti81xx_boards_compat,
+#if 0
+	.restart	= am33xx_restart,
+#endif
+MACHINE_END
+#endif
+
 #ifdef CONFIG_ARCH_OMAP4
 static const char *omap4_boards_compat[] __initdata = {
 	"ti,omap4",

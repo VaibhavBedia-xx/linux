@@ -165,19 +165,19 @@ void ti81xx_musb_phy_power(u8 on)
 	usbphycfg = __raw_readl(scm_base + USBCTRL0);
 
 	if (on) {
-		if (cpu_is_ti816x()) {
+		if (soc_is_ti816x()) {
 			usbphycfg |= TI816X_USBPHY0_NORMAL_MODE;
 			usbphycfg &= ~TI816X_USBPHY_REFCLK_OSC;
-		} else if (cpu_is_ti814x()) {
+		} else if (soc_is_ti814x()) {
 			usbphycfg &= ~(USBPHY_CM_PWRDN | USBPHY_OTG_PWRDN
 				| USBPHY_DPINPUT | USBPHY_DMINPUT);
 			usbphycfg |= (USBPHY_OTGVDET_EN | USBPHY_OTGSESSEND_EN
 				| USBPHY_DPOPBUFCTL | USBPHY_DMOPBUFCTL);
 		}
 	} else {
-		if (cpu_is_ti816x())
+		if (soc_is_ti816x())
 			usbphycfg &= ~TI816X_USBPHY0_NORMAL_MODE;
-		else if (cpu_is_ti814x())
+		else if (soc_is_ti814x())
 			usbphycfg |= USBPHY_CM_PWRDN | USBPHY_OTG_PWRDN;
 
 	}

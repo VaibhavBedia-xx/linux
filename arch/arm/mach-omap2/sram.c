@@ -289,6 +289,8 @@ static inline int am33xx_sram_init(void)
 
 int __init omap_sram_init(void)
 {
+	return 0;
+
 	omap_detect_sram();
 	omap2_map_sram();
 
