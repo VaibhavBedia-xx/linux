@@ -32,7 +32,7 @@
 
 	am33xx_pinmux: pinmux@44e10800 {
 		pinctrl-names = "default";
-		pinctrl-0 = <&user_leds_s0 &gpio_keys_s0>;
+		pinctrl-0 = <&user_leds_s0 &gpio_keys_s0 &ddr3_vtt_toggle>;
 
 		user_leds_s0: user_leds_s0 {
 			pinctrl-single,pins = <
@@ -49,6 +49,12 @@
 				0x90 0x27	/* gpmc_advn_ale.gpio2_2, INPUT | MODE7 */
 				0x70 0x27	/* gpmc_wait0.gpio0_30, INPUT | MODE7 */
 				0x9c 0x27	/* gpmc_ben0_cle.gpio2_5, INPUT | MODE7 */
+			>;
+		};
+
+		ddr3_vtt_toggle: ddr3_vtt_toggle {
+			pinctrl-single,pins = <
+				0x164 0x7	/* ecap0_in_pwm0_out.gpio0_7, OUTPUT | MODE7 */
 			>;
 		};
 	};
@@ -93,6 +99,11 @@
 				st,max-limit-y = <550>;
 				st,max-limit-z = <750>;
 			};
+		};
+
+		wkup_m3: wkup_m3@44d00000 {
+			ti,needs_vtt_toggle;
+			vtt-gpio-pin = <7>;
 		};
 	};
 
