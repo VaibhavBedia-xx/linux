@@ -1,0 +1,31 @@
+/*
+ * Copyright (C) 2013 Texas Instruments Incorporated - http://www.ti.com/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/* AM43 HAPS */
+
+/dts-v1/;
+
+/include/ "am4372.dtsi"
+
+/ {
+	model = "TI AM43 HAPS";
+	compatible = "ti,am43-haps","ti,am4372","ti,am43";
+
+	memory {
+		device_type = "memory";
+		reg = <0x80000000 0x08000000>; /* 128 MB */
+	};
+
+	chosen {
+		bootargs = "console=ttyO0,38400n8 root=/dev/ram rw initrd=0x82000000,32MB earlyprintk";
+	};
+};
+
+&uart1 {
+	clock-frequency = <12000000>;
+};
