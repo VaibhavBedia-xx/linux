@@ -355,6 +355,7 @@ DEFINE_CLK_MUX(clkout2_mux2_out, clkout2_mux2_out_parents, NULL, 0x0,
 	       AM43XX_CM_CLKOUT1_CTRL, AM43XX_CLKOUT1SOURCE_SHIFT,
 	       AM43XX_CLKOUT1SOURCE_WIDTH, 0x0, NULL);
 
+#ifndef CONFIG_SOC_AM43XX
 static const char *clkout2_prediv_parents[] = {
 	"clkout2_mux1_out", "clkout2_mux2_out",
 };
@@ -369,6 +370,7 @@ DEFINE_CLK_DIVIDER(clkout2_div1, "clkout2_prediv", &clkout2_prediv, 0x0,
 DEFINE_CLK_DIVIDER(clkout2_div2, "clkout2_div1", &clkout2_div1, 0x0,
 		   AM43XX_CM_CLKOUT2_CTRL, AM43XX_CLKOUT2POSTDIV_SHIFT,
 		   AM43XX_CLKOUT2POSTDIV_WIDTH, CLK_DIVIDER_POWER_OF_TWO, NULL);
+#endif 
 
 DEFINE_CLK_FIXED_FACTOR(core_l4_clkdiv, "sysclk_div", &sysclk_div, 0x0, 1, 2);
 
@@ -534,6 +536,7 @@ DEFINE_CLK_MUX(icss_ocp_clk_mux, icss_ocp_clk_mux_parents, NULL, 0x0,
 
 DEFINE_CLK_FIXED_FACTOR(mmc_clk, "dpll_per_m2_ck", &dpll_per_m2_ck, 0x0, 1, 2);
 
+#ifndef CONFIG_SOC_AM43XX
 static const char *mux_clkout1_parents[] = {
 	"clkout1sel0div", "clkout_32k", "clkout1sel2div2",
 	"dpll_extdev_m2_ck",
@@ -541,6 +544,7 @@ static const char *mux_clkout1_parents[] = {
 
 DEFINE_CLK_MUX(mux_clkout1, mux_clkout1_parents, NULL, 0x0, AM43XX_,
 	       AM43XX__SHIFT, AM43XX__WIDTH, 0x0, NULL);
+#endif 
 
 static const char *mux_mag_fclk_parents[] = {
 	"sys_clkin", "dpll_per_m2_ck",
@@ -558,13 +562,14 @@ DEFINE_CLK_MUX(mux_synctimer32k_ck, mux_synctimer32k_ck_parents, NULL, 0x0,
 	       AM43XX_CLKSEL_SYNCTIMER_CLK, AM43XX_CLKSEL_SHIFT,
 	       AM43XX_CLKSEL_WIDTH, 0x0, NULL);
 
+#ifndef CONFIG_SOC_AM43XX
 static const char *timer0_gclk_parents[] = {
 	"clk_32k_rc", "clk_32k_tpm", "sys_clkin",
 };
 
 DEFINE_CLK_MUX(timer0_gclk, timer0_gclk_parents, NULL, 0x0, AM43XX_,
 	       AM43XX__SHIFT, AM43XX__WIDTH, 0x0, NULL);
-
+#endif 
 static const char *timer10_clk_parents[] = {
 	"tclkin", "sys_clkin", "clk_32k_per",
 	"clk_32k_tpm",
@@ -656,13 +661,14 @@ DEFINE_CLK_MUX(usim_dbclkmux, usim_dbclkmux_parents, NULL, 0x0,
 
 DEFINE_CLK_FIXED_FACTOR(vtp_clk_div, "sys_clkin", &sys_clkin, 0x0, 1, 2);
 
+#ifndef CONFIG_SOC_AM43XX
 static const char *wdt0_gclk_parents[] = {
 	"clk_32k_rc", "clk_32k_tpm",
 };
 
 DEFINE_CLK_MUX(wdt0_gclk, wdt0_gclk_parents, NULL, 0x0, AM43XX_, AM43XX__SHIFT,
 	       AM43XX__WIDTH, 0x0, NULL);
-
+#endif 
 static const char *wdt1_clkmux_parents[] = {
 	"clk_32k_rc", "clk_32k_per",
 };
@@ -727,9 +733,11 @@ static struct omap_clk am43xx_clks[] = {
 	CLK(NULL,	"dpll_extdev_ck",	&dpll_extdev_ck,	CK_43XX),
 	CLK(NULL,	"dpll_extdev_m2_ck",	&dpll_extdev_m2_ck,	CK_43XX),
 	CLK(NULL,	"clkout2_mux2_out",	&clkout2_mux2_out,	CK_43XX),
+#ifndef CONFIG_SOC_AM43XX
 	CLK(NULL,	"clkout2_prediv",	&clkout2_prediv,	CK_43XX),
 	CLK(NULL,	"clkout2_div1",		&clkout2_div1,	CK_43XX),
 	CLK(NULL,	"clkout2_div2",		&clkout2_div2,	CK_43XX),
+#endif 
 	CLK(NULL,	"core_l4_clkdiv",	&core_l4_clkdiv,	CK_43XX),
 	CLK(NULL,	"dpll_core_m5x2_ck",	&dpll_core_m5x2_ck,	CK_43XX),
 	CLK(NULL,	"cpsw_125mhz_ocp_ck",	&cpsw_125mhz_ocp_ck,	CK_43XX),
@@ -753,10 +761,14 @@ static struct omap_clk am43xx_clks[] = {
 	CLK(NULL,	"i2c_clk",		&i2c_clk,	CK_43XX),
 	CLK(NULL,	"icss_ocp_clk_mux",	&icss_ocp_clk_mux,	CK_43XX),
 	CLK(NULL,	"mmc_clk",		&mmc_clk,	CK_43XX),
+#ifndef CONFIG_SOC_AM43XX
 	CLK(NULL,	"mux_clkout1",		&mux_clkout1,	CK_43XX),
+#endif 
 	CLK(NULL,	"mux_mag_fclk",		&mux_mag_fclk,	CK_43XX),
 	CLK(NULL,	"mux_synctimer32k_ck",	&mux_synctimer32k_ck,	CK_43XX),
+#ifndef CONFIG_SOC_AM43XX
 	CLK(NULL,	"timer0_gclk",		&timer0_gclk,	CK_43XX),
+#endif 
 	CLK(NULL,	"timer10_clk",		&timer10_clk,	CK_43XX),
 	CLK(NULL,	"timer11_clk",		&timer11_clk,	CK_43XX),
 	CLK(NULL,	"timer1_clkmux",	&timer1_clkmux,	CK_43XX),
@@ -774,7 +786,9 @@ static struct omap_clk am43xx_clks[] = {
 	CLK(NULL,	"usim1_fclk_mux",	&usim1_fclk_mux,	CK_43XX),
 	CLK(NULL,	"usim_dbclkmux",	&usim_dbclkmux,	CK_43XX),
 	CLK(NULL,	"vtp_clk_div",		&vtp_clk_div,	CK_43XX),
+#ifndef CONFIG_SOC_AM43XX
 	CLK(NULL,	"wdt0_gclk",		&wdt0_gclk,	CK_43XX),
+#endif 
 	CLK(NULL,	"wdt1_clkmux",		&wdt1_clkmux,	CK_43XX),
 	CLK(NULL,	"usim0_fclk",		&usim0_fclk,	CK_43XX),
 	CLK(NULL,	"usim0_fclk32",		&usim0_fclk32,	CK_43XX),
