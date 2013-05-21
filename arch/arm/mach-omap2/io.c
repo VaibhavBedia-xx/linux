@@ -37,6 +37,7 @@
 #include "clock.h"
 #include "clock2xxx.h"
 #include "clock3xxx.h"
+#include "clock43xx.h"
 #include "clock44xx.h"
 #include "omap-pm.h"
 #include "sdrc.h"
@@ -604,8 +605,15 @@ void __init am43xx_init_early(void)
 				  NULL);
 	omap2_set_globals_prm(AM33XX_L4_WK_IO_ADDRESS(AM43XX_PRCM_BASE));
 	omap2_set_globals_cm(AM33XX_L4_WK_IO_ADDRESS(AM43XX_PRCM_BASE), NULL);
+        omap_prm_base_init();
+        omap_cm_base_init();
 	omap3xxx_check_revision();
 	ti81xx_check_features();
+	am43xx_powerdomains_init();
+	am43xx_clockdomains_init();
+	am43xx_hwmod_init();
+	omap_hwmod_init_postsetup();
+	omap_clk_init = am5xxx_clk_init();
 }
 #endif
 
