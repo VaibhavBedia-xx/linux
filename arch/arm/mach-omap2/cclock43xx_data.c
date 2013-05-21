@@ -127,7 +127,7 @@ static struct clk_hw_omap dpll_per_ck_hw = {
 
 DEFINE_STRUCT_CLK(dpll_per_ck, dpll_per_ck_parents, dpll_per_ck_ops);
 
-DEFINE_CLK_OMAP_HSDIVIDER63(dpll_per_m2_ck, "dpll_per_ck", &dpll_per_ck, 0x0,
+DEFINE_CLK_OMAP_HSDIVIDER(dpll_per_m2_ck, "dpll_per_ck", &dpll_per_ck, 0x0,
 			    AM43XX_CM_DIV_M2_DPLL_PER,
 			    AM43XX_DPLL_CLKOUT_DIV_MASK);
 
@@ -199,7 +199,7 @@ static struct clk_hw_omap dpll_core_x2_ck_hw = {
 DEFINE_STRUCT_CLK(dpll_core_x2_ck, dpll_core_x2_ck_parents,
 		  dpll_core_x2_ck_ops);
 
-DEFINE_CLK_OMAP_HSDIVIDER63(dpll_core_m4x2_ck, "dpll_core_x2_ck",
+DEFINE_CLK_OMAP_HSDIVIDER(dpll_core_m4x2_ck, "dpll_core_x2_ck",
 			    &dpll_core_x2_ck, 0x0, AM43XX_CM_DIV_M4_DPLL_CORE,
 			    AM43XX_HSDIVIDER_CLKOUT1_DIV_MASK);
 
@@ -249,7 +249,7 @@ static struct clk_hw_omap dpll_ddr_ck_hw = {
 
 DEFINE_STRUCT_CLK(dpll_ddr_ck, dpll_per_ck_parents, dpll_per_ck_ops);
 
-DEFINE_CLK_OMAP_HSDIVIDER63(dpll_ddr_m2_ck, "dpll_ddr_ck", &dpll_ddr_ck, 0x0,
+DEFINE_CLK_OMAP_HSDIVIDER(dpll_ddr_m2_ck, "dpll_ddr_ck", &dpll_ddr_ck, 0x0,
 			    AM43XX_CM_DIV_M2_DPLL_DDR,
 			    AM43XX_DPLL_CLKOUT_DIV_MASK);
 
@@ -282,7 +282,7 @@ static struct clk_hw_omap dpll_disp_ck_hw = {
 
 DEFINE_STRUCT_CLK(dpll_disp_ck, dpll_per_ck_parents, dpll_per_ck_ops);
 
-DEFINE_CLK_OMAP_HSDIVIDER63(dpll_disp_m2_ck, "dpll_disp_ck", &dpll_disp_ck, 0x0,
+DEFINE_CLK_OMAP_HSDIVIDER(dpll_disp_m2_ck, "dpll_disp_ck", &dpll_disp_ck, 0x0,
 			    AM43XX_CM_DIV_M2_DPLL_DISP,
 			    AM43XX_DPLL_CLKOUT_DIV_MASK);
 
@@ -342,7 +342,7 @@ static struct clk_hw_omap dpll_extdev_ck_hw = {
 
 DEFINE_STRUCT_CLK(dpll_extdev_ck, dpll_per_ck_parents, dpll_per_ck_ops);
 
-DEFINE_CLK_OMAP_HSDIVIDER63(dpll_extdev_m2_ck, "dpll_extdev_ck",
+DEFINE_CLK_OMAP_HSDIVIDER(dpll_extdev_m2_ck, "dpll_extdev_ck",
 			    &dpll_extdev_ck, 0x0, AM43XX_CM_DIV_M2_DPLL_EXTDEV,
 			    AM43XX_DPLL_CLKOUT_DIV_MASK);
 
@@ -374,7 +374,7 @@ DEFINE_CLK_DIVIDER(clkout2_div2, "clkout2_div1", &clkout2_div1, 0x0,
 
 DEFINE_CLK_FIXED_FACTOR(core_l4_clkdiv, "sysclk_div", &sysclk_div, 0x0, 1, 2);
 
-DEFINE_CLK_OMAP_HSDIVIDER63(dpll_core_m5x2_ck, "dpll_core_x2_ck",
+DEFINE_CLK_OMAP_HSDIVIDER(dpll_core_m5x2_ck, "dpll_core_x2_ck",
 			    &dpll_core_x2_ck, 0x0, AM43XX_CM_DIV_M5_DPLL_CORE,
 			    AM43XX_HSDIVIDER_CLKOUT2_DIV_MASK);
 
@@ -441,7 +441,7 @@ DEFINE_CLK_DIVIDER_TABLE(dll_aging_clk_div, "sys_clkin", &sys_clkin, 0x0,
 			 AM43XX_CLKSEL_WIDTH, 0x0, dll_aging_clk_div_rates,
 			 NULL);
 
-DEFINE_CLK_OMAP_HSDIVIDER63(dpll_core_m6x2_ck, "dpll_core_x2_ck",
+DEFINE_CLK_OMAP_HSDIVIDER(dpll_core_m6x2_ck, "dpll_core_x2_ck",
 			    &dpll_core_x2_ck, 0x0, AM43XX_CM_DIV_M6_DPLL_CORE,
 			    AM43XX_HSDIVIDER_CLKOUT3_DIV_MASK);
 
@@ -459,7 +459,7 @@ static struct clk_hw_omap dpll_ddr_x2_ck_hw = {
 
 DEFINE_STRUCT_CLK(dpll_ddr_x2_ck, dpll_ddr_x2_ck_parents, dpll_core_x2_ck_ops);
 
-DEFINE_CLK_OMAP_HSDIVIDER63(dpll_ddr_m4x2_ck, "dpll_ddr_x2_ck", &dpll_ddr_x2_ck,
+DEFINE_CLK_OMAP_HSDIVIDER(dpll_ddr_m4x2_ck, "dpll_ddr_x2_ck", &dpll_ddr_x2_ck,
 			    0x0, AM43XX_CM_DIV_M4_DPLL_DDR,
 			    AM43XX_HSDIVIDER_CLKOUT1_DIV_MASK);
 
@@ -492,7 +492,7 @@ static struct clk_hw_omap dpll_mpu_ck_hw = {
 
 DEFINE_STRUCT_CLK(dpll_mpu_ck, dpll_per_ck_parents, dpll_per_ck_ops);
 
-DEFINE_CLK_OMAP_HSDIVIDER63(dpll_mpu_m2_ck, "dpll_mpu_ck", &dpll_mpu_ck, 0x0,
+DEFINE_CLK_OMAP_HSDIVIDER(dpll_mpu_m2_ck, "dpll_mpu_ck", &dpll_mpu_ck, 0x0,
 			    AM43XX_CM_DIV_M2_DPLL_MPU,
 			    AM43XX_DPLL_CLKOUT_DIV_MASK);
 
@@ -701,125 +701,125 @@ DEFINE_CLK_GATE(usim1_fclk32, "usim_dbclkmux", &usim_dbclkmux, 0x0,
  */
 
 static struct omap_clk am43xx_clks[] = {
-	CLK(NULL,	"clk_32k_mosc_ck",	&clk_32k_mosc_ck,	CK_43XX),
-	CLK(NULL,	"clk_32k_per_ck",	&clk_32k_per_ck,	CK_43XX),
-	CLK(NULL,	"clk_32k_rc_ck",	&clk_32k_rc_ck,	CK_43XX),
-	CLK(NULL,	"clk_32k_rtc_ck",	&clk_32k_rtc_ck,	CK_43XX),
-	CLK(NULL,	"clk_32k_tpm_ck",	&clk_32k_tpm_ck,	CK_43XX),
-	CLK(NULL,	"mpu_pll_clk_ck",	&mpu_pll_clk_ck,	CK_43XX),
-	CLK(NULL,	"virt_19200000_ck",	&virt_19200000_ck,	CK_43XX),
-	CLK(NULL,	"virt_24000000_ck",	&virt_24000000_ck,	CK_43XX),
-	CLK(NULL,	"virt_25000000_ck",	&virt_25000000_ck,	CK_43XX),
-	CLK(NULL,	"virt_26000000_ck",	&virt_26000000_ck,	CK_43XX),
-	CLK(NULL,	"sys_clkin",		&sys_clkin,	CK_43XX),
-	CLK(NULL,	"tclkin_ck",		&tclkin_ck,	CK_43XX),
-	CLK(NULL,	"dpll_per_ck",		&dpll_per_ck,	CK_43XX),
-	CLK(NULL,	"dpll_per_m2_ck",	&dpll_per_m2_ck,	CK_43XX),
-	CLK(NULL,	"clk_div_24",		&clk_div_24,	CK_43XX),
-	CLK(NULL,	"clkout1sel0div",	&clkout1sel0div,	CK_43XX),
-	CLK(NULL,	"clkout_32k",		&clkout_32k,	CK_43XX),
-	CLK(NULL,	"dpll_core_ck",		&dpll_core_ck,	CK_43XX),
-	CLK(NULL,	"dpll_core_x2_ck",	&dpll_core_x2_ck,	CK_43XX),
-	CLK(NULL,	"dpll_core_m4x2_ck",	&dpll_core_m4x2_ck,	CK_43XX),
-	CLK(NULL,	"sysclk_div",		&sysclk_div,	CK_43XX),
-	CLK(NULL,	"dpll_ddr_ck",		&dpll_ddr_ck,	CK_43XX),
-	CLK(NULL,	"dpll_ddr_m2_ck",	&dpll_ddr_m2_ck,	CK_43XX),
-	CLK(NULL,	"dpll_disp_ck",		&dpll_disp_ck,	CK_43XX),
-	CLK(NULL,	"dpll_disp_m2_ck",	&dpll_disp_m2_ck,	CK_43XX),
-	CLK(NULL,	"clkout1sel2_prediv",	&clkout1sel2_prediv,	CK_43XX),
-	CLK(NULL,	"clkout1sel2div1",	&clkout1sel2div1,	CK_43XX),
-	CLK(NULL,	"clkout1sel2div2",	&clkout1sel2div2,	CK_43XX),
-	CLK(NULL,	"clkout2_mux1_out",	&clkout2_mux1_out,	CK_43XX),
-	CLK(NULL,	"dpll_extdev_ck",	&dpll_extdev_ck,	CK_43XX),
-	CLK(NULL,	"dpll_extdev_m2_ck",	&dpll_extdev_m2_ck,	CK_43XX),
-	CLK(NULL,	"clkout2_mux2_out",	&clkout2_mux2_out,	CK_43XX),
+	CLK(NULL,	"clk_32k_mosc_ck",	&clk_32k_mosc_ck),
+	CLK(NULL,	"clk_32k_per_ck",	&clk_32k_per_ck),
+	CLK(NULL,	"clk_32k_rc_ck",	&clk_32k_rc_ck),
+	CLK(NULL,	"clk_32k_rtc_ck",	&clk_32k_rtc_ck),
+	CLK(NULL,	"clk_32k_tpm_ck",	&clk_32k_tpm_ck),
+	CLK(NULL,	"mpu_pll_clk_ck",	&mpu_pll_clk_ck),
+	CLK(NULL,	"virt_19200000_ck",	&virt_19200000_ck),
+	CLK(NULL,	"virt_24000000_ck",	&virt_24000000_ck),
+	CLK(NULL,	"virt_25000000_ck",	&virt_25000000_ck),
+	CLK(NULL,	"virt_26000000_ck",	&virt_26000000_ck),
+	CLK(NULL,	"sys_clkin",		&sys_clkin),
+	CLK(NULL,	"tclkin_ck",		&tclkin_ck),
+	CLK(NULL,	"dpll_per_ck",		&dpll_per_ck),
+	CLK(NULL,	"dpll_per_m2_ck",	&dpll_per_m2_ck),
+	CLK(NULL,	"clk_div_24",		&clk_div_24),
+	CLK(NULL,	"clkout1sel0div",	&clkout1sel0div),
+	CLK(NULL,	"clkout_32k",		&clkout_32k),
+	CLK(NULL,	"dpll_core_ck",		&dpll_core_ck),
+	CLK(NULL,	"dpll_core_x2_ck",	&dpll_core_x2_ck),
+	CLK(NULL,	"dpll_core_m4x2_ck",	&dpll_core_m4x2_ck),
+	CLK(NULL,	"sysclk_div",		&sysclk_div),
+	CLK(NULL,	"dpll_ddr_ck",		&dpll_ddr_ck),
+	CLK(NULL,	"dpll_ddr_m2_ck",	&dpll_ddr_m2_ck),
+	CLK(NULL,	"dpll_disp_ck",		&dpll_disp_ck),
+	CLK(NULL,	"dpll_disp_m2_ck",	&dpll_disp_m2_ck),
+	CLK(NULL,	"clkout1sel2_prediv",	&clkout1sel2_prediv),
+	CLK(NULL,	"clkout1sel2div1",	&clkout1sel2div1),
+	CLK(NULL,	"clkout1sel2div2",	&clkout1sel2div2),
+	CLK(NULL,	"clkout2_mux1_out",	&clkout2_mux1_out),
+	CLK(NULL,	"dpll_extdev_ck",	&dpll_extdev_ck),
+	CLK(NULL,	"dpll_extdev_m2_ck",	&dpll_extdev_m2_ck),
+	CLK(NULL,	"clkout2_mux2_out",	&clkout2_mux2_out),
 #ifndef CONFIG_SOC_AM43XX
-	CLK(NULL,	"clkout2_prediv",	&clkout2_prediv,	CK_43XX),
-	CLK(NULL,	"clkout2_div1",		&clkout2_div1,	CK_43XX),
-	CLK(NULL,	"clkout2_div2",		&clkout2_div2,	CK_43XX),
+	CLK(NULL,	"clkout2_prediv",	&clkout2_prediv),
+	CLK(NULL,	"clkout2_div1",		&clkout2_div1),
+	CLK(NULL,	"clkout2_div2",		&clkout2_div2),
 #endif 
-	CLK(NULL,	"core_l4_clkdiv",	&core_l4_clkdiv,	CK_43XX),
-	CLK(NULL,	"dpll_core_m5x2_ck",	&dpll_core_m5x2_ck,	CK_43XX),
-	CLK(NULL,	"cpsw_125mhz_ocp_ck",	&cpsw_125mhz_ocp_ck,	CK_43XX),
-	CLK(NULL,	"cpsw_50m_clkdiv",	&cpsw_50m_clkdiv,	CK_43XX),
-	CLK(NULL,	"cpsw_5m_clkdiv",	&cpsw_5m_clkdiv,	CK_43XX),
-	CLK(NULL,	"cpts_rft_clkmux",	&cpts_rft_clkmux,	CK_43XX),
-	CLK(NULL,	"disp_clk",		&disp_clk,	CK_43XX),
-	CLK(NULL,	"div_core_25m_ck",	&div_core_25m_ck,	CK_43XX),
-	CLK(NULL,	"sgx_clksel",		&sgx_clksel,	CK_43XX),
-	CLK(NULL,	"div_gfx_fclk",		&div_gfx_fclk,	CK_43XX),
-	CLK(NULL,	"div_usim_fclk",	&div_usim_fclk,	CK_43XX),
-	CLK(NULL,	"dll_aging_clk_div",	&dll_aging_clk_div,	CK_43XX),
-	CLK(NULL,	"dpll_core_m6x2_ck",	&dpll_core_m6x2_ck,	CK_43XX),
-	CLK(NULL,	"dpll_ddr_x2_ck",	&dpll_ddr_x2_ck,	CK_43XX),
-	CLK(NULL,	"dpll_ddr_m4x2_ck",	&dpll_ddr_m4x2_ck,	CK_43XX),
-	CLK(NULL,	"dpll_mpu_ck",		&dpll_mpu_ck,	CK_43XX),
-	CLK(NULL,	"dpll_mpu_m2_ck",	&dpll_mpu_m2_ck,	CK_43XX),
-	CLK(NULL,	"dpll_per_clkdcoldo",	&dpll_per_clkdcoldo,	CK_43XX),
-	CLK(NULL,	"func_12m_clk",		&func_12m_clk,	CK_43XX),
-	CLK(NULL,	"gpio_dbclk_mux",	&gpio_dbclk_mux,	CK_43XX),
-	CLK(NULL,	"i2c_clk",		&i2c_clk,	CK_43XX),
-	CLK(NULL,	"icss_ocp_clk_mux",	&icss_ocp_clk_mux,	CK_43XX),
-	CLK(NULL,	"mmc_clk",		&mmc_clk,	CK_43XX),
+	CLK(NULL,	"core_l4_clkdiv",	&core_l4_clkdiv),
+	CLK(NULL,	"dpll_core_m5x2_ck",	&dpll_core_m5x2_ck),
+	CLK(NULL,	"cpsw_125mhz_ocp_ck",	&cpsw_125mhz_ocp_ck),
+	CLK(NULL,	"cpsw_50m_clkdiv",	&cpsw_50m_clkdiv),
+	CLK(NULL,	"cpsw_5m_clkdiv",	&cpsw_5m_clkdiv),
+	CLK(NULL,	"cpts_rft_clkmux",	&cpts_rft_clkmux),
+	CLK(NULL,	"disp_clk",		&disp_clk),
+	CLK(NULL,	"div_core_25m_ck",	&div_core_25m_ck),
+	CLK(NULL,	"sgx_clksel",		&sgx_clksel),
+	CLK(NULL,	"div_gfx_fclk",		&div_gfx_fclk),
+	CLK(NULL,	"div_usim_fclk",	&div_usim_fclk),
+	CLK(NULL,	"dll_aging_clk_div",	&dll_aging_clk_div),
+	CLK(NULL,	"dpll_core_m6x2_ck",	&dpll_core_m6x2_ck),
+	CLK(NULL,	"dpll_ddr_x2_ck",	&dpll_ddr_x2_ck),
+	CLK(NULL,	"dpll_ddr_m4x2_ck",	&dpll_ddr_m4x2_ck),
+	CLK(NULL,	"dpll_mpu_ck",		&dpll_mpu_ck),
+	CLK(NULL,	"dpll_mpu_m2_ck",	&dpll_mpu_m2_ck),
+	CLK(NULL,	"dpll_per_clkdcoldo",	&dpll_per_clkdcoldo),
+	CLK(NULL,	"func_12m_clk",		&func_12m_clk),
+	CLK(NULL,	"gpio_dbclk_mux",	&gpio_dbclk_mux),
+	CLK(NULL,	"i2c_clk",		&i2c_clk),
+	CLK(NULL,	"icss_ocp_clk_mux",	&icss_ocp_clk_mux),
+	CLK(NULL,	"mmc_clk",		&mmc_clk),
 #ifndef CONFIG_SOC_AM43XX
-	CLK(NULL,	"mux_clkout1",		&mux_clkout1,	CK_43XX),
+	CLK(NULL,	"mux_clkout1",		&mux_clkout1),
 #endif 
-	CLK(NULL,	"mux_mag_fclk",		&mux_mag_fclk,	CK_43XX),
-	CLK(NULL,	"mux_synctimer32k_ck",	&mux_synctimer32k_ck,	CK_43XX),
+	CLK(NULL,	"mux_mag_fclk",		&mux_mag_fclk),
+	CLK(NULL,	"mux_synctimer32k_ck",	&mux_synctimer32k_ck),
 #ifndef CONFIG_SOC_AM43XX
-	CLK(NULL,	"timer0_gclk",		&timer0_gclk,	CK_43XX),
+	CLK(NULL,	"timer0_gclk",		&timer0_gclk),
 #endif 
-	CLK(NULL,	"timer10_clk",		&timer10_clk,	CK_43XX),
-	CLK(NULL,	"timer11_clk",		&timer11_clk,	CK_43XX),
-	CLK(NULL,	"timer1_clkmux",	&timer1_clkmux,	CK_43XX),
-	CLK(NULL,	"timer2_clk",		&timer2_clk,	CK_43XX),
-	CLK(NULL,	"timer3_clk",		&timer3_clk,	CK_43XX),
-	CLK(NULL,	"timer4_clk",		&timer4_clk,	CK_43XX),
-	CLK(NULL,	"timer5_clk",		&timer5_clk,	CK_43XX),
-	CLK(NULL,	"timer6_clk",		&timer6_clk,	CK_43XX),
-	CLK(NULL,	"timer7_clk",		&timer7_clk,	CK_43XX),
-	CLK(NULL,	"timer8_clk",		&timer8_clk,	CK_43XX),
-	CLK(NULL,	"timer9_clk",		&timer9_clk,	CK_43XX),
-	CLK(NULL,	"uart0_clk",		&uart0_clk,	CK_43XX),
-	CLK(NULL,	"usbphy_32khz_clkmux",	&usbphy_32khz_clkmux,	CK_43XX),
-	CLK(NULL,	"usim0_fclk_mux",	&usim0_fclk_mux,	CK_43XX),
-	CLK(NULL,	"usim1_fclk_mux",	&usim1_fclk_mux,	CK_43XX),
-	CLK(NULL,	"usim_dbclkmux",	&usim_dbclkmux,	CK_43XX),
-	CLK(NULL,	"vtp_clk_div",		&vtp_clk_div,	CK_43XX),
+	CLK(NULL,	"timer10_clk",		&timer10_clk),
+	CLK(NULL,	"timer11_clk",		&timer11_clk),
+	CLK(NULL,	"timer1_clkmux",	&timer1_clkmux),
+	CLK(NULL,	"timer2_clk",		&timer2_clk),
+	CLK(NULL,	"timer3_clk",		&timer3_clk),
+	CLK(NULL,	"timer4_clk",		&timer4_clk),
+	CLK(NULL,	"timer5_clk",		&timer5_clk),
+	CLK(NULL,	"timer6_clk",		&timer6_clk),
+	CLK(NULL,	"timer7_clk",		&timer7_clk),
+	CLK(NULL,	"timer8_clk",		&timer8_clk),
+	CLK(NULL,	"timer9_clk",		&timer9_clk),
+	CLK(NULL,	"uart0_clk",		&uart0_clk),
+	CLK(NULL,	"usbphy_32khz_clkmux",	&usbphy_32khz_clkmux),
+	CLK(NULL,	"usim0_fclk_mux",	&usim0_fclk_mux),
+	CLK(NULL,	"usim1_fclk_mux",	&usim1_fclk_mux),
+	CLK(NULL,	"usim_dbclkmux",	&usim_dbclkmux),
+	CLK(NULL,	"vtp_clk_div",		&vtp_clk_div),
 #ifndef CONFIG_SOC_AM43XX
-	CLK(NULL,	"wdt0_gclk",		&wdt0_gclk,	CK_43XX),
+	CLK(NULL,	"wdt0_gclk",		&wdt0_gclk),
 #endif 
-	CLK(NULL,	"wdt1_clkmux",		&wdt1_clkmux,	CK_43XX),
-	CLK(NULL,	"usim0_fclk",		&usim0_fclk,	CK_43XX),
-	CLK(NULL,	"usim0_fclk32",		&usim0_fclk32,	CK_43XX),
-	CLK(NULL,	"usim1_fclk",		&usim1_fclk,	CK_43XX),
-	CLK(NULL,	"usim1_fclk32",		&usim1_fclk32,	CK_43XX),
-	CLK(NULL,	"gpmc_ck",		&dummy_ck,	CK_43XX),
-	CLK("omap_i2c.1",	"ick",		&dummy_ck,	CK_43XX),
-	CLK("omap_i2c.2",	"ick",		&dummy_ck,	CK_43XX),
-	CLK("omap_i2c.3",	"ick",		&dummy_ck,	CK_43XX),
-	CLK("omap_i2c.4",	"ick",		&dummy_ck,	CK_43XX),
-	CLK(NULL,	"mailboxes_ick",	&dummy_ck,	CK_43XX),
-	CLK("omap_hsmmc.0",	"ick",		&dummy_ck,	CK_43XX),
-	CLK("omap_hsmmc.1",	"ick",		&dummy_ck,	CK_43XX),
-	CLK("omap_hsmmc.2",	"ick",		&dummy_ck,	CK_43XX),
-	CLK("omap_hsmmc.3",	"ick",		&dummy_ck,	CK_43XX),
-	CLK("omap_hsmmc.4",	"ick",		&dummy_ck,	CK_43XX),
-	CLK("omap-mcbsp.1",	"ick",		&dummy_ck,	CK_43XX),
-	CLK("omap-mcbsp.2",	"ick",		&dummy_ck,	CK_43XX),
-	CLK("omap-mcbsp.3",	"ick",		&dummy_ck,	CK_43XX),
-	CLK("omap-mcbsp.4",	"ick",		&dummy_ck,	CK_43XX),
-	CLK("omap2_mcspi.1",	"ick",		&dummy_ck,	CK_43XX),
-	CLK("omap2_mcspi.2",	"ick",		&dummy_ck,	CK_43XX),
-	CLK("omap2_mcspi.3",	"ick",		&dummy_ck,	CK_43XX),
-	CLK("omap2_mcspi.4",	"ick",		&dummy_ck,	CK_43XX),
-	CLK(NULL,	"uart1_ick",		&dummy_ck,	CK_43XX),
-	CLK(NULL,	"uart2_ick",		&dummy_ck,	CK_43XX),
-	CLK(NULL,	"uart3_ick",		&dummy_ck,	CK_43XX),
-	CLK(NULL,	"uart4_ick",		&dummy_ck,	CK_43XX),
-	CLK("usbhs_omap",	"usbhost_ick",	&dummy_ck,	CK_43XX),
-	CLK("usbhs_omap",	"usbtll_fck",	&dummy_ck,	CK_43XX),
-	CLK("omap_wdt",	"ick",			&dummy_ck,	CK_43XX),
+	CLK(NULL,	"wdt1_clkmux",		&wdt1_clkmux),
+	CLK(NULL,	"usim0_fclk",		&usim0_fclk),
+	CLK(NULL,	"usim0_fclk32",		&usim0_fclk32),
+	CLK(NULL,	"usim1_fclk",		&usim1_fclk),
+	CLK(NULL,	"usim1_fclk32",		&usim1_fclk32),
+	CLK(NULL,	"gpmc_ck",		&dummy_ck),
+	CLK("omap_i2c.1",	"ick",		&dummy_ck),
+	CLK("omap_i2c.2",	"ick",		&dummy_ck),
+	CLK("omap_i2c.3",	"ick",		&dummy_ck),
+	CLK("omap_i2c.4",	"ick",		&dummy_ck),
+	CLK(NULL,	"mailboxes_ick",	&dummy_ck),
+	CLK("omap_hsmmc.0",	"ick",		&dummy_ck),
+	CLK("omap_hsmmc.1",	"ick",		&dummy_ck),
+	CLK("omap_hsmmc.2",	"ick",		&dummy_ck),
+	CLK("omap_hsmmc.3",	"ick",		&dummy_ck),
+	CLK("omap_hsmmc.4",	"ick",		&dummy_ck),
+	CLK("omap-mcbsp.1",	"ick",		&dummy_ck),
+	CLK("omap-mcbsp.2",	"ick",		&dummy_ck),
+	CLK("omap-mcbsp.3",	"ick",		&dummy_ck),
+	CLK("omap-mcbsp.4",	"ick",		&dummy_ck),
+	CLK("omap2_mcspi.1",	"ick",		&dummy_ck),
+	CLK("omap2_mcspi.2",	"ick",		&dummy_ck),
+	CLK("omap2_mcspi.3",	"ick",		&dummy_ck),
+	CLK("omap2_mcspi.4",	"ick",		&dummy_ck),
+	CLK(NULL,	"uart1_ick",		&dummy_ck),
+	CLK(NULL,	"uart2_ick",		&dummy_ck),
+	CLK(NULL,	"uart3_ick",		&dummy_ck),
+	CLK(NULL,	"uart4_ick",		&dummy_ck),
+	CLK("usbhs_omap",	"usbhost_ick",	&dummy_ck),
+	CLK("usbhs_omap",	"usbtll_fck",	&dummy_ck),
+	CLK("omap_wdt",	"ick",			&dummy_ck),
 };
 
 /*
