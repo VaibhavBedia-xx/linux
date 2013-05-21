@@ -33,7 +33,7 @@
 #define OMAP4430_PRCM_MPU_PARTITION		5
 
 #define AM43XX_PRM_PARTITION                   1
-#define AM43XX_CM_PARTITION                    2
+#define AM43XX_CM_PARTITION                    1
 
 /*
  * OMAP4_MAX_PRCM_PARTITIONS: set to the highest value of the PRCM partition
