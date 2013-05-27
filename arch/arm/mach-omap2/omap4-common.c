@@ -163,7 +163,10 @@ void __iomem *omap4_get_l2cache_base(void)
 static void omap4_l2x0_disable(void)
 {
 	/* Disable PL310 L2 Cache controller */
-	omap_smc1(0x102, 0x0);
+	if (soc_is_am43xx())
+		omap_smc1(0x107, 0x0);
+	else
+		omap_smc1(0x102, 0x0);
 }
 
 static void omap4_l2x0_set_debug(unsigned long val)
