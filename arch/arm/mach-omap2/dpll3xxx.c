@@ -38,8 +38,11 @@
 #define DPLL_AUTOIDLE_DISABLE			0x0
 #define DPLL_AUTOIDLE_LOW_POWER_STOP		0x1
 
+#ifndef CONFIG_SOC_AM43XX
 #define MAX_DPLL_WAIT_TRIES		1000000
-
+#else
+#define MAX_DPLL_WAIT_TRIES             10
+#endif
 /* Private functions */
 
 /* _omap3_dpll_write_clken - write clken_bits arg to a DPLL's enable bits */

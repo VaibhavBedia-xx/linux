@@ -3078,7 +3078,9 @@ static struct omap_hwmod_ocp_if *am43xx_hwmod_ocp_ifs[] __initdata = {
 	&am43xx_l4ls__epwmss3,
 	&am43xx_l4ls__epwmss4,
 	&am43xx_l3__gfx,
+#ifndef CONFIG_SOC_AM43XX
 	&am43xx_l4wkup__gpio0,
+#endif
 	&am43xx_l4ls__gpio1,
 	&am43xx_l4ls__gpio2,
 	&am43xx_l4ls__gpio3,
@@ -3105,7 +3107,9 @@ static struct omap_hwmod_ocp_if *am43xx_hwmod_ocp_ifs[] __initdata = {
 	&am43xx_l4wkup__smartreflex1,
 	&am43xx_l4ls__spinlock,
 	&am43xx_l4wkup__synctimer,
+#ifndef CONFIG_SOC_AM43XX
 	&am43xx_l4wkup__timer0,
+#endif
 	&am43xx_l4wkup__timer1,
 	&am43xx_l4ls__timer2,
 	&am43xx_l4ls__timer3,
@@ -3118,9 +3122,11 @@ static struct omap_hwmod_ocp_if *am43xx_hwmod_ocp_ifs[] __initdata = {
 	&am43xx_l4ls__timer10,
 	&am43xx_l4ls__timer11,
 	&am43xx_l4wkup__tpmss,
+#ifndef CONFIG_SOC_AM43XX
 	&am43xx_l4wkup__uart0,
 	&am43xx_l4ls__uart1,
 	&am43xx_l4ls__uart2,
+#endif
 	&am43xx_l4ls__uart3,
 	&am43xx_l4ls__uart4,
 	&am43xx_l4ls__uart5,
@@ -3128,7 +3134,9 @@ static struct omap_hwmod_ocp_if *am43xx_hwmod_ocp_ifs[] __initdata = {
 	&am43xx_l4ls__usim1,
 	&am43xx_l4ls__vpfe0,
 	&am43xx_l4ls__vpfe1,
+#ifndef CONFIG_SOC_AM43XX
 	&am43xx_l4wkup__wdt0,
+#endif
 	&am43xx_l4wkup__wdt1,
 	NULL,
 };
