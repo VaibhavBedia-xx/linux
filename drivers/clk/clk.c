@@ -776,9 +776,13 @@ static void __clk_disable(struct clk *clk)
 
 	if (WARN_ON(IS_ERR(clk)))
 		return;
-
+#ifndef CONFIG_SOC_AM43XX
 	if (WARN_ON(clk->enable_count == 0))
 		return;
+#else
+	if (clk->enable_count == 0)
+		return;
+#endif
 
 	if (--clk->enable_count > 0)
 		return;
