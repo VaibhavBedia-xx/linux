@@ -820,6 +820,7 @@ static struct omap_clk am43xx_clks[] = {
 	CLK("usbhs_omap",	"usbhost_ick",	&dummy_ck),
 	CLK("usbhs_omap",	"usbtll_fck",	&dummy_ck),
 	CLK("omap_wdt",	"ick",			&dummy_ck),
+	CLK(NULL,       "timer_sys_ck",         &sys_clkin),
 };
 
 /*
