@@ -582,7 +582,6 @@ void __init am33xx_init_early(void)
 	omap3xxx_check_revision();
 	ti81xx_check_features();
 	omap44xx_prm_init();
-	am33xx_voltagedomains_init();
 	am33xx_powerdomains_init();
 	am33xx_clockdomains_init();
 	am33xx_hwmod_init();
