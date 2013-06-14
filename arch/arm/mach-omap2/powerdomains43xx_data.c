@@ -136,6 +136,12 @@ static struct powerdomain per_43xx_pwrdm = {
 	.flags		  = PWRDM_HAS_LOWPOWERSTATECHANGE,
 };
 
+static int am43xx_check_vcvp(void)
+{
+       /* No VC/VP on am33xx devices */
+       return 0;
+}
+
 /*
  * The following power domains are not under SW control
  *
@@ -156,6 +162,7 @@ static struct powerdomain *powerdomains_am43xx[] __initdata = {
 
 void __init am43xx_powerdomains_init(void)
 {
+	omap4_pwrdm_operations.pwrdm_has_voltdm = am43xx_check_vcvp;
 	pwrdm_register_platform_funcs(&omap4_pwrdm_operations);
 	pwrdm_register_pwrdms(powerdomains_am43xx);
 	pwrdm_complete_init();
