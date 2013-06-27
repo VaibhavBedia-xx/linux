@@ -489,7 +489,20 @@ __fixup_smp:
 	mrc	p15, 0, r0, c0, c0, 5	@ read MPIDR
 	and	r0, r0, #0xc0000000	@ multiprocessing extensions and
 	teq	r0, #0x80000000		@ not part of a uniprocessor system?
-	moveq	pc, lr			@ yes, assume SMP
+	bne    __fixup_smp_on_up	@ no, assume UP
+
+	mov	r3, #0x0000ff00
+	orr	r3, r3, #0x000000f0	@ mask for Primary part number
+	and	r3, r9, r3
+	mov	r4, #0x0000c000
+	orr	r4, r4, #0x00000090	@ check for 0x0000c090 CORTEX-A9
+	teq	r3, r4
+	movne	pc, lr
+	mrc	p15, 4, r0, c15, c0	@ get SCU base address
+	ldr	r0, [r0, #4]		@ read SCU Config
+	and	r0, r0, #0x3		@ number of CPUs
+	teq	r0, #0x0		@ is 1?
+	movne	pc, lr
 
 __fixup_smp_on_up:
 	adr	r0, 1f
