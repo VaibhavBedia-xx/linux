@@ -38,9 +38,11 @@
 #define MBOX_REG_SIZE			0x120
 
 #define OMAP4_MBOX_REG_SIZE		0x130
+#define AM33XX_MBOX_REG_SIZE		0x140
 
 #define MBOX_NR_REGS			(MBOX_REG_SIZE / sizeof(u32))
 #define OMAP4_MBOX_NR_REGS		(OMAP4_MBOX_REG_SIZE / sizeof(u32))
+#define AM33XX_MBOX_NR_REGS		(AM33XX_MBOX_REG_SIZE / sizeof(u32))
 
 static void __iomem *mbox_base;
 
@@ -57,7 +59,7 @@ struct omap_mbox2_priv {
 	unsigned long irqstatus;
 	u32 newmsg_bit;
 	u32 notfull_bit;
-	u32 ctx[OMAP4_MBOX_NR_REGS];
+	u32 ctx[AM33XX_MBOX_NR_REGS];
 	unsigned long irqdisable;
 };
 
@@ -191,8 +193,11 @@ static void omap2_mbox_save_ctx(struct omap_mbox *mbox)
 	int nr_regs;
 	if (cpu_is_omap44xx())
 		nr_regs = OMAP4_MBOX_NR_REGS;
+	else if (soc_is_am33xx())
+		nr_regs = AM33XX_MBOX_NR_REGS;
 	else
 		nr_regs = MBOX_NR_REGS;
+
 	for (i = 0; i < nr_regs; i++) {
 		p->ctx[i] = mbox_read_reg(i * sizeof(u32));
 
@@ -208,8 +213,11 @@ static void omap2_mbox_restore_ctx(struct omap_mbox *mbox)
 	int nr_regs;
 	if (cpu_is_omap44xx())
 		nr_regs = OMAP4_MBOX_NR_REGS;
+	else if (soc_is_am33xx())
+		nr_regs = AM33XX_MBOX_NR_REGS;
 	else
 		nr_regs = MBOX_NR_REGS;
+
 	for (i = 0; i < nr_regs; i++) {
 		mbox_write_reg(p->ctx[i], i * sizeof(u32));
 
