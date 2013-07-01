@@ -1782,12 +1782,10 @@ static int _omap4_disable_module(struct omap_hwmod *oh)
 				    oh->clkdm->cm_inst,
 				    oh->clkdm->clkdm_offs,
 				    oh->prcm.omap4.clkctrl_offs);
-#ifndef CONFIG_SOC_AM43XX
 	v = _omap4_wait_target_disable(oh);
 	if (v)
 		pr_warn("omap_hwmod: %s: _wait_target_disable failed\n",
 			oh->name);
-#endif
 
 	return 0;
 }
@@ -1839,14 +1837,12 @@ static int _ocp_softreset(struct omap_hwmod *oh)
 
 	if (oh->class->sysc->srst_udelay)
 		udelay(oh->class->sysc->srst_udelay);
-#ifndef CONFIG_SOC_AM43XX
 	c = _wait_softreset_complete(oh);
 	if (c == MAX_MODULE_SOFTRESET_WAIT)
 		pr_warning("omap_hwmod: %s: softreset failed (waited %d usec)\n",
 			   oh->name, MAX_MODULE_SOFTRESET_WAIT);
 	else
 		pr_debug("omap_hwmod: %s: softreset in %d usec\n", oh->name, c);
-#endif
 	/*
 	 * XXX add _HWMOD_STATE_WEDGED for modules that don't come back from
 	 * _wait_target_ready() or _reset()
@@ -2092,14 +2088,13 @@ static int _enable(struct omap_hwmod *oh)
 		soc_ops.enable_module(oh);
 	if (oh->flags & HWMOD_BLOCK_WFI)
 		cpu_idle_poll_ctrl(true);
-#ifndef CONFIG_SOC_AM43XX
+#if 0
 	if (soc_ops.update_context_lost)
 		soc_ops.update_context_lost(oh);
 	r = (soc_ops.wait_target_ready) ? soc_ops.wait_target_ready(oh) :
 		-EINVAL;
-#else
-       r = 0;
 #endif
+       r = 0;
 	if (!r) {
 		/*
 		 * Set the clockdomain to HW_AUTO only if the target is ready,
