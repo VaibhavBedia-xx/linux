@@ -33,8 +33,13 @@
 #include "omap4-sar-layout.h"
 #include "common.h"
 
+/* 224 interrupts on Aegis */
+#define MAX_NR_REG_BANKS	7
+#define MAX_IRQS		224
+#if 0
 #define MAX_NR_REG_BANKS	5
 #define MAX_IRQS		160
+#endif
 #define WKG_MASK_ALL		0x00000000
 #define WKG_UNMASK_ALL		0xffffffff
 #define CPU_ENA_OFFSET		0x400
@@ -272,6 +277,35 @@ static inline void omap5_irq_save_context(void)
 
 }
 
+static unsigned int wkupgen_context[MAX_NR_REG_BANKS];
+
+static inline void am43xx_irq_save_context(void)
+{
+	u32 i, val;
+
+	for (i = 0; i < irq_banks; i++) {
+		/* Save the CPUx interrupt mask for IRQ 0 to 223 */
+		val = wakeupgen_readl(i, 0);
+		wkupgen_context[i] = val;
+	pr_err("%s @ %d %d\n", __func__, __LINE__, val);
+		/* explicitly clearoff the wakeupgen register */
+		wakeupgen_writel(0, i, CPU0_ID);
+	}
+
+#if 0
+	/* Save AuxBoot* registers */
+	val = __raw_readl(wakeupgen_base + OMAP_AUX_CORE_BOOT_0);
+	__raw_writel(val, sar_base + OMAP5_AUXCOREBOOT0_OFFSET);
+	val = __raw_readl(wakeupgen_base + OMAP_AUX_CORE_BOOT_0);
+	__raw_writel(val, sar_base + OMAP5_AUXCOREBOOT1_OFFSET);
+
+	/* Set the Backup Bit Mask status */
+	val = __raw_readl(sar_base + OMAP5_SAR_BACKUP_STATUS_OFFSET);
+	val |= SAR_BACKUP_STATUS_WAKEUPGEN;
+	__raw_writel(val, sar_base + OMAP5_SAR_BACKUP_STATUS_OFFSET);
+#endif
+}
+
 /*
  * Save WakeupGen interrupt context in SAR BANK3. Restore is done by
  * ROM code. WakeupGen IP is integrated along with GIC to manage the
@@ -282,6 +316,9 @@ static inline void omap5_irq_save_context(void)
  */
 static void irq_save_context(void)
 {
+	if (soc_is_am43xx())
+		am43xx_irq_save_context();
+#if 0
 	if (!sar_base)
 		sar_base = omap4_get_sar_ram_base();
 
@@ -289,6 +326,7 @@ static void irq_save_context(void)
 		omap5_irq_save_context();
 	else
 		omap4_irq_save_context();
+#endif
 }
 
 /*
@@ -299,12 +337,27 @@ static void irq_sar_clear(void)
 	u32 val;
 	u32 offset = SAR_BACKUP_STATUS_OFFSET;
 
+	if (soc_is_am43xx())
+		return;
+
 	if (soc_is_omap54xx())
 		offset = OMAP5_SAR_BACKUP_STATUS_OFFSET;
 
 	val = __raw_readl(sar_base + offset);
 	val &= ~SAR_BACKUP_STATUS_WAKEUPGEN;
 	__raw_writel(val, sar_base + offset);
+}
+
+static void irq_restore_context(void)
+{
+	u32 i, val;
+
+	for (i = 0; i < irq_banks; i++) {
+		/* Restore the CPUx interrupt mask for IRQ 0 to 223 */
+		val = wakeupgen_readl(i, 0);
+	pr_err("%s @ %d %d\n", __func__, __LINE__, val);
+		wakeupgen_writel(wkupgen_context[i], i, CPU0_ID);
+	}
 }
 
 /*
@@ -364,7 +417,10 @@ static int irq_notifier(struct notifier_block *self, unsigned long cmd,	void *v)
 		break;
 	case CPU_CLUSTER_PM_EXIT:
 		if (omap_type() == OMAP2_DEVICE_TYPE_GP)
+			irq_restore_context();
+#if 0
 			irq_sar_clear();
+#endif
 		break;
 	}
 	return NOTIFY_OK;
