@@ -501,7 +501,9 @@ static struct notifier_block vfp_cpu_pm_notifier_block = {
 
 static void vfp_pm_init(void)
 {
+#if 0
 	cpu_pm_register_notifier(&vfp_cpu_pm_notifier_block);
+#endif
 }
 
 #else
