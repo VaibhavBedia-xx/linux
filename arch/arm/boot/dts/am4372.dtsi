@@ -41,16 +41,21 @@
 	};
 
 	ocp {
-		compatible = "simple-bus";
+		compatible = "ti,omap4-l3-noc", "simple-bus";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges;
-		
+		ti,hwmods = "l3", "l3_s";
+		reg = <0x44000000 0x400000>,
+		      <0x44800000 0x400000>;
+		interrupts = <0 9 0x4>,
+			     <0 10 0x4>;
+
 		uart0: serial@44e09000 {
 			compatible = "ti,am4372-uart","ti,omap4-uart";
 			reg = <0x44e09000 0x400>;
-			interrupts = <0 72 0x4>;
 			ti,hwmods = "uart0";
+			interrupts = <0 72 0x4>;
 		};
 
 		uart1: serial@48022000 {
@@ -86,6 +91,63 @@
 			compatible = "ti,am4372-counter32k","ti,omap-counter32k";
 			reg = <0x44e86000 0x40>;
 			ti,hwmods = "synctimer";
+		};
+
+		tpcc: tpcc@49000000 {
+			compatible = "ti,tpcc";
+			reg = <0x49000000 0x1000>;
+			ti,hwmods = "tpcc";
+		};
+
+		tptc0: tptc0@49800000 {
+			compatible = "ti,tptc";
+			reg = <0x49800000 0x200>;
+			ti,hwmods = "tptc0";
+			interrupts = <0 112 0x4>;
+		};
+
+		tptc1: tptc1@49900000 {
+			compatible = "ti,tptc";
+			reg = <0x49900000 0x200>;
+			ti,hwmods = "tptc1";
+			interrupts = <0 113 0x4>;
+		};
+
+		tptc2: tptc2@49a00000 {
+			compatible = "ti,tptc";
+			reg = <0x49a00000 0x200>;
+			ti,hwmods = "tptc2";
+			interrupts = <0 114 0x4>;
+		};
+
+		edma: edma@49000000 {
+			compatible = "ti,edma3";
+			reg = <0x44e10f90 0x10>;
+			#dma-cells = <1>;
+			dma-channels = <64>;
+			ti,edma-regions = <4>;
+			ti,edma-slots = <256>;
+			ti,edma-queue-tc-map = <0 0
+						1 1
+						2 2>;
+			ti,edma-queue-priority-map = <0 0
+						      1 1
+						      2 2>;
+			ti,edma-default-queue = <0>;
+		};
+
+		ocmcram: ocmcram@40300000 {
+			compatible = "ti,am3352-ocmcram";
+			reg = <0x40300000 0x10000>;
+			ti,hwmods = "ocmcram";
+		};
+
+		wkup_m3: wkup_m3@44d00000 {
+			compatible = "ti,am3353-wkup-m3";
+			reg = <0x44d00000 0x4000	/* M3 UMEM */
+			       0x44d80000 0x2000>;	/* M3 DMEM */
+			interrupts = <0 78 0x4>;
+			ti,hwmods = "wkup_m3";
 		};
 	};
 };
