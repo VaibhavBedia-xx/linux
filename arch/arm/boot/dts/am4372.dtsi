@@ -33,13 +33,6 @@
 		      <0x48240100 0x0100>;
 	};
 
-	l2-cache-controller@48242000 {
-		compatible = "arm,pl310-cache";
-		reg = <0x48242000 0x1000>;
-		cache-unified;
-		cache-level = <2>;
-	};
-
 	ocp {
 		compatible = "ti,omap4-l3-noc", "simple-bus";
 		#address-cells = <1>;
@@ -51,25 +44,11 @@
 		interrupts = <0 9 0x4>,
 			     <0 10 0x4>;
 
-		uart0: serial@44e09000 {
+		uart1: serial@44e09000 {
 			compatible = "ti,am4372-uart","ti,omap4-uart";
-			reg = <0x44e09000 0x400>;
+			reg = <0x44e09000 0x2000>;
 			ti,hwmods = "uart0";
 			interrupts = <0 72 0x4>;
-		};
-
-		uart1: serial@48022000 {
-			compatible = "ti,am4372-uart","ti,omap4-uart";
-			reg = <0x48022000 0x400>;
-			interrupts = <0 73 0x4>;
-			ti,hwmods = "uart1";
-		};
-
-		uart2: serial@48024000 {
-			compatible = "ti,am4372-uart","ti,omap4-uart";
-			reg = <0x48024000 0x400>;
-			interrupts = <0 74 0x4>;
-			ti,hwmods = "uart2";
 		};
 
 		timer1: timer@44e31000 {
