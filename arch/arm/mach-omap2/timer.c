@@ -622,7 +622,7 @@ OMAP_SYS_32K_TIMER_INIT(3_secure, 12, "secure_32k_fck", "ti,timer-secure",
 #endif /* CONFIG_ARCH_OMAP3 */
 
 #if defined(CONFIG_SOC_AM43XX)
-OMAP_SYS_32K_TIMER_INIT(3, 1, "timer_sys_ck", "ti,timer-alwon",
+OMAP_SYS_32K_TIMER_INIT(43, 1, "timer_sys_ck", "ti,timer-alwon",
 			2, "timer_sys_ck", NULL);
 #endif 
 
