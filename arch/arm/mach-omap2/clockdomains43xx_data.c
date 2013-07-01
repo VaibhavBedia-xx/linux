@@ -36,7 +36,7 @@ static struct clockdomain l4_cefuse_43xx_clkdm = {
 	.prcm_partition	  = AM43XX_CM_PARTITION,
 	.cm_inst	  = AM43XX_CM_CEFUSE_INST,
 	.clkdm_offs	  = AM43XX_CM_CEFUSE_CEFUSE_CDOFFS,
-	.flags		  = CLKDM_CAN_FORCE_WAKEUP | CLKDM_CAN_FORCE_SLEEP,
+	.flags		  = CLKDM_CAN_SWSUP,
 };
 
 static struct clockdomain mpu_43xx_clkdm = {
@@ -45,7 +45,7 @@ static struct clockdomain mpu_43xx_clkdm = {
 	.prcm_partition	  = AM43XX_CM_PARTITION,
 	.cm_inst	  = AM43XX_CM_MPU_INST,
 	.clkdm_offs	  = AM43XX_CM_MPU_MPU_CDOFFS,
-	.flags		  = CLKDM_CAN_HWSUP_SWSUP,
+	.flags		  = CLKDM_CAN_SWSUP,
 };
 
 static struct clockdomain l4ls_43xx_clkdm = {
@@ -54,7 +54,7 @@ static struct clockdomain l4ls_43xx_clkdm = {
 	.prcm_partition	  = AM43XX_CM_PARTITION,
 	.cm_inst	  = AM43XX_CM_PER_INST,
 	.clkdm_offs	  = AM43XX_CM_PER_L4LS_CDOFFS,
-	.flags		  = CLKDM_CAN_FORCE_WAKEUP | CLKDM_CAN_FORCE_SLEEP,
+	.flags		  = CLKDM_CAN_SWSUP,
 };
 
 static struct clockdomain tamper_43xx_clkdm = {
@@ -63,7 +63,7 @@ static struct clockdomain tamper_43xx_clkdm = {
 	.prcm_partition	  = AM43XX_CM_PARTITION,
 	.cm_inst	  = AM43XX_CM_TAMPER_INST,
 	.clkdm_offs	  = AM43XX_CM_TAMPER_TAMPER_CDOFFS,
-	.flags		  = CLKDM_CAN_FORCE_WAKEUP | CLKDM_CAN_FORCE_SLEEP,
+	.flags		  = CLKDM_CAN_SWSUP,
 };
 
 static struct clockdomain rtc_43xx_clkdm = {
@@ -72,7 +72,7 @@ static struct clockdomain rtc_43xx_clkdm = {
 	.prcm_partition	  = AM43XX_CM_PARTITION,
 	.cm_inst	  = AM43XX_CM_RTC_INST,
 	.clkdm_offs	  = AM43XX_CM_RTC_RTC_CDOFFS,
-	.flags		  = CLKDM_CAN_FORCE_WAKEUP | CLKDM_CAN_FORCE_SLEEP,
+	.flags		  = CLKDM_CAN_SWSUP,
 };
 
 static struct clockdomain icss_43xx_clkdm = {
@@ -81,7 +81,7 @@ static struct clockdomain icss_43xx_clkdm = {
 	.prcm_partition	  = AM43XX_CM_PARTITION,
 	.cm_inst	  = AM43XX_CM_PER_INST,
 	.clkdm_offs	  = AM43XX_CM_PER_ICSS_CDOFFS,
-	.flags		  = CLKDM_CAN_FORCE_WAKEUP | CLKDM_CAN_FORCE_SLEEP,
+	.flags		  = CLKDM_CAN_SWSUP,
 };
 
 static struct clockdomain ocpwp_l3_43xx_clkdm = {
@@ -90,7 +90,7 @@ static struct clockdomain ocpwp_l3_43xx_clkdm = {
 	.prcm_partition	  = AM43XX_CM_PARTITION,
 	.cm_inst	  = AM43XX_CM_PER_INST,
 	.clkdm_offs	  = AM43XX_CM_PER_OCPWP_L3_CDOFFS,
-	.flags		  = CLKDM_CAN_FORCE_WAKEUP | CLKDM_CAN_FORCE_SLEEP,
+	.flags		  = CLKDM_CAN_SWSUP,
 };
 
 static struct clockdomain l3s_tsc_43xx_clkdm = {
@@ -99,7 +99,7 @@ static struct clockdomain l3s_tsc_43xx_clkdm = {
 	.prcm_partition	  = AM43XX_CM_PARTITION,
 	.cm_inst	  = AM43XX_CM_WKUP_INST,
 	.clkdm_offs	  = AM43XX_CM_WKUP_L3S_TSC_CDOFFS,
-	.flags		  = CLKDM_CAN_FORCE_WAKEUP | CLKDM_CAN_FORCE_SLEEP,
+	.flags		  = CLKDM_CAN_SWSUP,
 };
 
 static struct clockdomain dss_43xx_clkdm = {
@@ -108,7 +108,7 @@ static struct clockdomain dss_43xx_clkdm = {
 	.prcm_partition	  = AM43XX_CM_PARTITION,
 	.cm_inst	  = AM43XX_CM_PER_INST,
 	.clkdm_offs	  = AM43XX_CM_PER_DSS_CDOFFS,
-	.flags		  = CLKDM_CAN_FORCE_WAKEUP | CLKDM_CAN_FORCE_SLEEP,
+	.flags		  = CLKDM_CAN_SWSUP,
 };
 
 static struct clockdomain l3_aon_43xx_clkdm = {
@@ -117,7 +117,7 @@ static struct clockdomain l3_aon_43xx_clkdm = {
 	.prcm_partition	  = AM43XX_CM_PARTITION,
 	.cm_inst	  = AM43XX_CM_WKUP_INST,
 	.clkdm_offs	  = AM43XX_CM_WKUP_L3_AON_CDOFFS,
-	.flags		  = CLKDM_CAN_FORCE_WAKEUP | CLKDM_CAN_FORCE_SLEEP,
+	.flags		  = CLKDM_CAN_SWSUP,
 };
 
 static struct clockdomain emif_43xx_clkdm = {
@@ -126,7 +126,7 @@ static struct clockdomain emif_43xx_clkdm = {
 	.prcm_partition	  = AM43XX_CM_PARTITION,
 	.cm_inst	  = AM43XX_CM_PER_INST,
 	.clkdm_offs	  = AM43XX_CM_PER_EMIF_CDOFFS,
-	.flags		  = CLKDM_CAN_FORCE_WAKEUP | CLKDM_CAN_FORCE_SLEEP,
+	.flags		  = CLKDM_CAN_SWSUP,
 };
 
 static struct clockdomain l4_wkup_aon_43xx_clkdm = {
@@ -135,6 +135,7 @@ static struct clockdomain l4_wkup_aon_43xx_clkdm = {
 	.prcm_partition	  = AM43XX_CM_PARTITION,
 	.cm_inst	  = AM43XX_CM_WKUP_INST,
 	.clkdm_offs	  = AM43XX_CM_WKUP_L4_WKUP_AON_CDOFFS,
+	.flags		  = CLKDM_CAN_SWSUP,
 };
 
 static struct clockdomain lcdc_43xx_clkdm = {
@@ -143,7 +144,7 @@ static struct clockdomain lcdc_43xx_clkdm = {
 	.prcm_partition	  = AM43XX_CM_PARTITION,
 	.cm_inst	  = AM43XX_CM_PER_INST,
 	.clkdm_offs	  = AM43XX_CM_PER_LCDC_CDOFFS,
-	.flags		  = CLKDM_CAN_FORCE_WAKEUP | CLKDM_CAN_FORCE_SLEEP,
+	.flags		  = CLKDM_CAN_SWSUP,
 };
 
 static struct clockdomain l3_43xx_clkdm = {
@@ -152,7 +153,7 @@ static struct clockdomain l3_43xx_clkdm = {
 	.prcm_partition	  = AM43XX_CM_PARTITION,
 	.cm_inst	  = AM43XX_CM_PER_INST,
 	.clkdm_offs	  = AM43XX_CM_PER_L3_CDOFFS,
-	.flags		  = CLKDM_CAN_FORCE_WAKEUP | CLKDM_CAN_FORCE_SLEEP,
+	.flags		  = CLKDM_CAN_SWSUP,
 };
 
 static struct clockdomain l4_wkup_43xx_clkdm = {
@@ -161,7 +162,7 @@ static struct clockdomain l4_wkup_43xx_clkdm = {
 	.prcm_partition	  = AM43XX_CM_PARTITION,
 	.cm_inst	  = AM43XX_CM_WKUP_INST,
 	.clkdm_offs	  = AM43XX_CM_WKUP_WKUP_CDOFFS,
-	.flags		  = CLKDM_CAN_FORCE_WAKEUP | CLKDM_CAN_FORCE_SLEEP,
+	.flags		  = CLKDM_CAN_SWSUP,
 };
 
 static struct clockdomain cpsw_43xx_clkdm = {
@@ -170,7 +171,7 @@ static struct clockdomain cpsw_43xx_clkdm = {
 	.prcm_partition	  = AM43XX_CM_PARTITION,
 	.cm_inst	  = AM43XX_CM_PER_INST,
 	.clkdm_offs	  = AM43XX_CM_PER_CPSW_CDOFFS,
-	.flags		  = CLKDM_CAN_FORCE_WAKEUP | CLKDM_CAN_FORCE_SLEEP,
+	.flags		  = CLKDM_CAN_SWSUP,
 };
 
 static struct clockdomain gfx_l3_43xx_clkdm = {
@@ -179,7 +180,7 @@ static struct clockdomain gfx_l3_43xx_clkdm = {
 	.prcm_partition	  = AM43XX_CM_PARTITION,
 	.cm_inst	  = AM43XX_CM_GFX_INST,
 	.clkdm_offs	  = AM43XX_CM_GFX_GFX_L3_CDOFFS,
-	.flags		  = CLKDM_CAN_FORCE_WAKEUP | CLKDM_CAN_FORCE_SLEEP,
+	.flags		  = CLKDM_CAN_SWSUP,
 };
 
 static struct clockdomain l3s_43xx_clkdm = {
@@ -188,7 +189,7 @@ static struct clockdomain l3s_43xx_clkdm = {
 	.prcm_partition	  = AM43XX_CM_PARTITION,
 	.cm_inst	  = AM43XX_CM_PER_INST,
 	.clkdm_offs	  = AM43XX_CM_PER_L3S_CDOFFS,
-	.flags		  = CLKDM_CAN_FORCE_WAKEUP | CLKDM_CAN_FORCE_SLEEP,
+	.flags		  = CLKDM_CAN_SWSUP,
 };
 
 /* As clockdomains are added or removed above, this list must also be changed */
@@ -216,7 +217,7 @@ static struct clockdomain *clockdomains_am43xx[] __initdata = {
 
 void __init am43xx_clockdomains_init(void)
 {
-	clkdm_register_platform_funcs(&omap4_clkdm_operations);
+	clkdm_register_platform_funcs(&am33xx_clkdm_operations);
 	clkdm_register_clkdms(clockdomains_am43xx);
 	clkdm_complete_init();
 }
