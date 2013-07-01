@@ -20,8 +20,10 @@
 #include <asm/assembler.h>
 
 #include "cm33xx.h"
+#include "cm43xx.h"
 #include "pm33xx.h"
 #include "prm33xx.h"
+#include "prm43xx.h"
 
 	.text
 	.align 3
@@ -50,6 +52,10 @@ ENTRY(am33xx_do_wfi)
 	str	r1, emif_addr_virt
 	str	r2, mem_type
 	str	r3, dram_sync_word
+
+	ldr	r0, scratchpad_virt
+	mov	r1, #0x1
+	str	r1, [r0]
 
 	/*
 	 * Flush all data from the L1 data cache before disabling
@@ -126,6 +132,10 @@ wait_sr:
 	subs	r1, r1, #1
 	bne	wait_sr
 
+	ldr	r0, scratchpad_virt
+	mov	r1, #0x2
+	str	r1, [r0]
+
 	/* Disable EMIF */
 	ldr	r1, virt_emif_clkctrl
 	ldr	r2, [r1]
@@ -149,6 +159,22 @@ wait_emif_disable:
 	bic	r2, r2, #0x03
 	str	r2, [r1]
 
+	/* AM43xx requires CLKTRCTRL to be either SW_SLEEP
+	 * or HW_AUTO.... SW_SLEEP to keep it compatible
+	 * with AM33xx
+	 */
+	ldr	r1, virt_mpu_clkstctrl
+	mov	r2, #0x1
+	str	r2, [r1]
+
+	ldr	r0, scratchpad_virt
+	mov	r1, #0x3
+	str	r1, [r0]
+
+	/* do a read from PRCM to be sure it worked */
+	ldr	r1, prcm_base
+	ldr	r2, [r1]
+
 	dsb
 	dmb
 	isb
@@ -170,7 +196,22 @@ wait_emif_disable:
 	nop
 	nop
 
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+
+	ldr	r0, scratchpad_virt
+	mov	r1, #0x4
+	str	r1, [r0]
+
 	/* We come here in case of an abort due to a late interrupt */
+
+	ldr	r1, virt_mpu_clkstctrl
+	mov	r2, #0x2
+	str	r2, [r1]
 
 	/* Set MPU_CLKCTRL.MODULEMODE back to ENABLE */
 	ldr	r1, virt_mpu_clkctrl
@@ -186,7 +227,11 @@ wait_emif_enable:
 	cmp	r2, r3
 	bne	wait_emif_enable
 
-	/* Disable EMIF self-refresh */
+	ldr	r0, scratchpad_virt
+	mov	r1, #0x5
+	str	r1, [r0]
+
+ 	/* Disable EMIF self-refresh */
 	ldr	r0, emif_addr_virt
 	ldr	r1, [r0, #EMIF_POWER_MANAGEMENT_CONTROL]
 	bic	r1, r1, #LP_MODE_MASK
@@ -217,6 +262,10 @@ wait_abt:
 	subs   r0, r0, #1
 	bne wait_abt
 
+	ldr	r0, scratchpad_virt
+	mov	r1, #0x6
+	str	r1, [r0]
+
 	/* Let the suspend code know about the abort */
 	mov	r0, #1
 	ldmfd	sp!, {r4 - r11, pc}	@ restore regs and return
@@ -227,6 +276,11 @@ ENTRY(am33xx_resume_offset)
 	.word . - am33xx_do_wfi
 
 ENTRY(am33xx_resume_from_deep_sleep)
+
+	ldr	r0, scratchpad
+	mov	r1, #0x10
+	str	r1, [r0]
+
 	/* Re-enable EMIF */
 	ldr	r0, phys_emif_clkctrl
 	mov	r1, #0x02
@@ -235,6 +289,10 @@ wait_emif_enable1:
 	ldr	r2, [r0]
 	cmp	r1, r2
 	bne	wait_emif_enable1
+
+	ldr	r0, scratchpad
+	mov	r1, #0x11
+	str	r1, [r0]
 
 	/* Config EMIF Timings */
 	ldr	r0, emif_phys_addr
@@ -287,6 +345,10 @@ wait_resume:
 	subs	r0, r0, #1
 	bne	wait_resume
 
+	ldr	r0, scratchpad
+	mov	r1, #0x12
+	str	r1, [r0]
+
 	/* We are back. Branch to the common CPU resume routine */
 	mov	r0, #0
 	ldr	pc, resume_addr
@@ -305,6 +367,20 @@ ddr_start:
 	.word	PAGE_OFFSET
 emif_phys_addr:
 	.word	AM33XX_EMIF_BASE
+
+prcm_base:
+	.word	AM43XX_PRM_REGADDR(0x0, 0x0)
+virt_mpu_clkstctrl:
+	.word	AM43XX_CM_MPU_CLKSTCTRL
+virt_mpu_clkctrl:
+	.word	AM43XX_CM_MPU_MPU_CLKCTRL
+virt_emif_clkctrl:
+	.word	AM43XX_CM_PER_EMIF_CLKCTRL
+phys_emif_clkctrl:
+	.word	(AM43XX_CM_BASE + AM43XX_CM_PER_INST + \
+		AM43XX_CM_PER_EMIF_CLKCTRL_OFFSET)
+
+#if 0
 virt_mpu_clkctrl:
 	.word	AM33XX_CM_MPU_MPU_CLKCTRL
 virt_emif_clkctrl:
@@ -312,6 +388,11 @@ virt_emif_clkctrl:
 phys_emif_clkctrl:
 	.word	(AM33XX_CM_BASE + AM33XX_CM_PER_MOD + \
 		AM33XX_CM_PER_EMIF_CLKCTRL_OFFSET)
+#endif
+scratchpad:
+	.word	0x44e11344
+scratchpad_virt:
+	.word	AM33XX_L4_WK_IO_ADDRESS(0x44e11344)
 module_disabled_val:
 	.word	0x30000
 

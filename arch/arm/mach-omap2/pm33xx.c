@@ -34,6 +34,7 @@
 #include <asm/sizes.h>
 #include <asm/fncpy.h>
 #include <asm/system_misc.h>
+#include <asm/smp_scu.h>
 
 #include "pm.h"
 #include "cm33xx.h"
@@ -75,6 +76,8 @@ struct forced_standby_module am33xx_mod[] = {
 	{.oh_name = "cpgmac0"},
 };
 
+static void __iomem *scu_base;
+
 #ifdef CONFIG_SUSPEND
 
 static struct am33xx_pm_context *am33xx_pm;
@@ -107,6 +110,7 @@ static int am33xx_pm_suspend(void)
 	 * that there no issues with or without the drivers being compiled
 	 * in the kernel, we forcefully put these IPs to idle.
 	 */
+#if 0
 	for (i = 0; i < ARRAY_SIZE(am33xx_mod); i++) {
 		pdev = to_platform_device(am33xx_mod[i].dev);
 		od = to_omap_device(pdev);
@@ -118,8 +122,18 @@ static int am33xx_pm_suspend(void)
 
 	/* Try to put GFX to sleep */
 	omap_set_pwrdm_state(gfx_pwrdm, PWRDM_POWER_OFF);
+#endif
+	if (soc_is_am43xx())
+		__raw_writel(0x03030303, scu_base + 0x8);
+
 	ret = cpu_suspend(0, am33xx_do_sram_idle);
 
+	omap_ctrl_writel(0x13, AM33XX_CONTROL_IPC_MSG_REG7);
+
+	if (soc_is_am43xx())
+		__raw_writel(0x03030300, scu_base + 0x8);
+
+#if 0
 	status = pwrdm_read_prev_pwrst(gfx_pwrdm);
 	if (status != PWRDM_POWER_OFF)
 		pr_err("GFX domain did not transition\n");
@@ -134,14 +148,16 @@ static int am33xx_pm_suspend(void)
 	 */
 	clkdm_wakeup(gfx_l4ls_clkdm);
 	clkdm_sleep(gfx_l4ls_clkdm);
-
+#endif
 	if (ret) {
 		pr_err("Kernel suspend failure\n");
 	} else {
+		omap_ctrl_writel(0x14, AM33XX_CONTROL_IPC_MSG_REG7);
 		i = am33xx_pm_status();
 		switch (i) {
 		case 0:
-			pr_info("Successfully put all powerdomains to target state\n");
+		omap_ctrl_writel(0x15, AM33XX_CONTROL_IPC_MSG_REG7);
+			pr_err("Successfully put all powerdomains to target state\n");
 			/*
 			 * XXX: Leads to loss of logic state in PER power domain
 			 * Use SOC specific ops for this?
@@ -160,7 +176,7 @@ static int am33xx_pm_suspend(void)
 		i = am33xx_pm_wake_src();
 		for (j = 0; j < ARRAY_SIZE(wakeups); j++) {
 			if (wakeups[j].irq_nr == i) {
-				pr_info("Wakeup src %s\n", wakeups[j].src);
+				pr_err("Wakeup src %s\n", wakeups[j].src);
 				break;
 			}
 		}
@@ -168,6 +184,8 @@ static int am33xx_pm_suspend(void)
 		if (j > ARRAY_SIZE(wakeups))
 			pr_info("Unknown wakeup source %d!!!\n", i);
 	}
+
+	omap_ctrl_writel(0x16, AM33XX_CONTROL_IPC_MSG_REG7);
 
 	return ret;
 }
@@ -212,11 +230,11 @@ static void am33xx_m3_state_machine_reset(void)
 
 	am33xx_pm->state = M3_STATE_MSG_FOR_RESET;
 
-	pr_info("Sending message for resetting M3 state machine\n");
+	pr_err("Sending message for resetting M3 state machine\n");
 
 	if (!am33xx_ping_wkup_m3()) {
 		i = wait_for_completion_timeout(&am33xx_pm_sync,
-					msecs_to_jiffies(500));
+					msecs_to_jiffies(1000));
 		if (WARN(i == 0, "MPU<->CM3 sync failure"))
 			am33xx_pm->state = M3_STATE_UNKNOWN;
 	}
@@ -236,7 +254,7 @@ static int am33xx_pm_begin(suspend_state_t state)
 
 	am33xx_pm->state = M3_STATE_MSG_FOR_LP;
 
-	pr_info("Sending message for entering DeepSleep mode\n");
+	pr_err("Sending message for entering DeepSleep mode\n");
 
 	if (!am33xx_ping_wkup_m3()) {
 		i = wait_for_completion_timeout(&am33xx_pm_sync,
@@ -250,6 +268,7 @@ static int am33xx_pm_begin(suspend_state_t state)
 
 static void am33xx_pm_end(void)
 {
+	omap_ctrl_writel(0x17, AM33XX_CONTROL_IPC_MSG_REG7);
 	am33xx_m3_state_machine_reset();
 
 	cpu_idle_poll_ctrl(false);
@@ -377,6 +396,22 @@ static int __init am33xx_map_emif(void)
 	return 0;
 }
 
+/* SCU base address */
+void __iomem *am43xx_get_scu_base(void)
+{
+	return scu_base;
+}
+
+static int __init am43xx_map_scu(void)
+{
+	scu_base = ioremap(scu_a9_get_base(), SZ_256);
+
+	if (!scu_base)
+		return -ENOMEM;
+
+	return 0;
+}
+
 int __init am33xx_pm_init(void)
 {
 	int ret;
@@ -384,11 +419,12 @@ int __init am33xx_pm_init(void)
 	struct device_node *np;
 	int i;
 
-	if (!soc_is_am33xx())
+	if (!soc_is_am33xx() && !soc_is_am43xx())
 		return -ENODEV;
 
-	pr_info("Power Management for AM33XX family\n");
+	pr_err("Power Management for AM33XX family\n");
 
+#if 0
 	/*
 	 * By default the following IPs do not have MSTANDBY asserted
 	 * which is necessary for PER domain transition. If the drivers
@@ -407,11 +443,17 @@ int __init am33xx_pm_init(void)
 		ret = -ENODEV;
 		goto err;
 	}
-
+#endif
 	am33xx_pm = kzalloc(sizeof(struct am33xx_pm_context), GFP_KERNEL);
 	if (!am33xx_pm) {
 		pr_err("Memory allocation failed\n");
 		ret = -ENOMEM;
+		goto err;
+	}
+
+	ret = am43xx_map_scu();
+	if (ret) {
+		pr_err("Could not ioremap SCU\n");
 		goto err;
 	}
 
@@ -456,7 +498,7 @@ int __init am33xx_pm_init(void)
 	temp = wkup_m3_is_inited();
 #endif
 
-	pr_info("Trying to load am335x-pm-firmware.bin");
+	pr_err("Trying to load am335x-pm-firmware.bin");
 
 	/* We don't want to delay boot */
 	request_firmware_nowait(THIS_MODULE, 0, "am335x-pm-firmware.bin",
