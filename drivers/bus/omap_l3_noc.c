@@ -91,7 +91,7 @@ static irqreturn_t l3_interrupt_handler(int irq, void *_l3)
 			case STANDARD_ERROR:
 				target_name =
 					l3_targ_inst_name[i][err_src];
-				WARN(true, "L3 standard error: TARGET:%s at address 0x%x\n",
+				pr_err("L3 standard error: TARGET:%s at address 0x%x\n",
 					target_name,
 					__raw_readl(l3_targ_base +
 						L3_TARG_STDERRLOG_SLVOFSLSB));
@@ -109,7 +109,7 @@ static irqreturn_t l3_interrupt_handler(int irq, void *_l3)
 						master_name =
 							l3_masters[k].name;
 				}
-				WARN(true, "L3 custom error: MASTER:%s TARGET:%s\n",
+				pr_err("L3 custom error: MASTER:%s TARGET:%s\n",
 					master_name, target_name);
 				/* clear the std error log*/
 				clear = std_err_main | CLEAR_STDERR_LOG;
@@ -167,6 +167,7 @@ static int omap4_l3_probe(struct platform_device *pdev)
 		goto err1;
 	}
 
+#if 0
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 2);
 	if (!res) {
 		dev_err(&pdev->dev, "couldn't find resource 2\n");
@@ -180,6 +181,7 @@ static int omap4_l3_probe(struct platform_device *pdev)
 		ret = -ENOMEM;
 		goto err2;
 	}
+#endif
 
 	/*
 	 * Setup interrupt Handlers
@@ -191,7 +193,7 @@ static int omap4_l3_probe(struct platform_device *pdev)
 	if (ret) {
 		pr_crit("L3: request_irq failed to register for 0x%x\n",
 						l3->debug_irq);
-		goto err3;
+		goto err2;
 	}
 
 	l3->app_irq = platform_get_irq(pdev, 1);
@@ -208,8 +210,10 @@ static int omap4_l3_probe(struct platform_device *pdev)
 
 err4:
 	free_irq(l3->debug_irq, l3);
+#if 0
 err3:
 	iounmap(l3->l3_base[2]);
+#endif
 err2:
 	iounmap(l3->l3_base[1]);
 err1:
@@ -227,7 +231,9 @@ static int omap4_l3_remove(struct platform_device *pdev)
 	free_irq(l3->debug_irq, l3);
 	iounmap(l3->l3_base[0]);
 	iounmap(l3->l3_base[1]);
+#if 0
 	iounmap(l3->l3_base[2]);
+#endif
 	kfree(l3);
 
 	return 0;
