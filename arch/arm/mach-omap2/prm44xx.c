@@ -23,6 +23,7 @@
 #include "iomap.h"
 #include "common.h"
 #include "vp.h"
+#include "prm43xx.h"
 #include "prm44xx.h"
 #include "prm-regbits-44xx.h"
 #include "prcm44xx.h"
@@ -333,7 +334,11 @@ static u32 omap44xx_prm_read_reset_sources(void)
 	u32 r = 0;
 	u32 v;
 
-	v = omap4_prm_read_inst_reg(OMAP4430_PRM_DEVICE_INST,
+	if (soc_is_am43xx())
+		v = omap4_prm_read_inst_reg(AM43XX_PRM_DEVICE_INST,
+				    OMAP4_RM_RSTST);
+	else
+		v = omap4_prm_read_inst_reg(OMAP4430_PRM_DEVICE_INST,
 				    OMAP4_RM_RSTST);
 
 	p = omap44xx_prm_reset_src_map;
@@ -629,9 +634,11 @@ struct pwrdm_ops omap4_pwrdm_operations = {
 	.pwrdm_read_prev_pwrst	= omap4_pwrdm_read_prev_pwrst,
 	.pwrdm_set_lowpwrstchange	= omap4_pwrdm_set_lowpwrstchange,
 	.pwrdm_clear_all_prev_pwrst	= omap4_pwrdm_clear_all_prev_pwrst,
+#if 0
 	.pwrdm_set_logic_retst	= omap4_pwrdm_set_logic_retst,
 	.pwrdm_read_logic_pwrst	= omap4_pwrdm_read_logic_pwrst,
 	.pwrdm_read_prev_logic_pwrst	= omap4_pwrdm_read_prev_logic_pwrst,
+#endif
 	.pwrdm_read_logic_retst	= omap4_pwrdm_read_logic_retst,
 	.pwrdm_read_mem_pwrst	= omap4_pwrdm_read_mem_pwrst,
 	.pwrdm_read_mem_retst	= omap4_pwrdm_read_mem_retst,
@@ -667,7 +674,7 @@ static struct prm_ll_data omap44xx_prm_ll_data = {
 
 int __init omap44xx_prm_init(void)
 {
-	if (!cpu_is_omap44xx() && !soc_is_omap54xx())
+	if (!cpu_is_omap44xx() && !soc_is_omap54xx() && !soc_is_am43xx())
 		return 0;
 
 	return prm_register(&omap44xx_prm_ll_data);
