@@ -577,11 +577,14 @@ void __init am33xx_init_early(void)
 				  NULL);
 	omap2_set_globals_prm(AM33XX_L4_WK_IO_ADDRESS(AM33XX_PRCM_BASE));
 	omap2_set_globals_cm(AM33XX_L4_WK_IO_ADDRESS(AM33XX_PRCM_BASE), NULL);
-	omap_prm_base_init();
-	omap_cm_base_init();
+        omap_prm_base_init();
+        omap_cm_base_init();
 	omap3xxx_check_revision();
 	ti81xx_check_features();
 	omap44xx_prm_init();
+#if 0
+	am33xx_voltagedomains_init();
+#endif
 	am33xx_powerdomains_init();
 	am33xx_clockdomains_init();
 	am33xx_hwmod_init();
@@ -595,7 +598,6 @@ void __init am33xx_init_late(void)
 	am33xx_pm_init();
 }
 
-#ifdef CONFIG_SOC_AM43XX
 void __init am43xx_init_early(void)
 {
 	omap2_set_globals_tap(AM335X_CLASS,
@@ -608,13 +610,13 @@ void __init am43xx_init_early(void)
         omap_cm_base_init();
 	omap3xxx_check_revision();
 	ti81xx_check_features();
+	omap44xx_prm_init();
 	am43xx_powerdomains_init();
 	am43xx_clockdomains_init();
 	am43xx_hwmod_init();
 	omap_hwmod_init_postsetup();
 	omap_clk_init = am5xxx_clk_init();
 }
-#endif
 
 #ifdef CONFIG_ARCH_OMAP4
 void __init omap4430_init_early(void)

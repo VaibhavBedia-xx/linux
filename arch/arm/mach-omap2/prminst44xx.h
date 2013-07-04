@@ -22,15 +22,13 @@ extern u32 omap4_prminst_rmw_inst_reg_bits(u32 mask, u32 bits, u8 part,
 					   s16 inst, u16 idx);
 
 extern void omap4_prminst_global_warm_sw_reset(void);
-extern void am33xx_prminst_global_warm_sw_reset(void);
 
 extern int omap4_prminst_is_hardreset_asserted(u8 shift, u8 part, s16 inst,
 					       u16 rstctrl_offs);
 extern int omap4_prminst_assert_hardreset(u8 shift, u8 part, s16 inst,
 					  u16 rstctrl_offs);
-extern int omap4_prminst_deassert_hardreset(u8 shift, u8 st_shift, u8 part,
-					    s16 inst, u16 rstctrl_offs,
-					    u16 rstst_offs);
+extern int omap4_prminst_deassert_hardreset(u8 shift, u8 st_shift, u8 part, s16 inst,
+					    u16 rstctrl_offs, u16 rstst_offs);
 
 extern void omap_prm_base_init(void);
 

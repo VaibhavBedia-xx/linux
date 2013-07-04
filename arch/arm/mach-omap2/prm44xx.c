@@ -23,8 +23,8 @@
 #include "iomap.h"
 #include "common.h"
 #include "vp.h"
-#include "prm43xx.h"
 #include "prm44xx.h"
+#include "prm43xx.h"
 #include "prm-regbits-44xx.h"
 #include "prcm44xx.h"
 #include "prminst44xx.h"
@@ -389,8 +389,8 @@ static int omap4_pwrdm_set_next_pwrst(struct powerdomain *pwrdm, u8 pwrst)
 	omap4_prminst_rmw_inst_reg_bits(OMAP_POWERSTATE_MASK,
 					(pwrst << OMAP_POWERSTATE_SHIFT),
 					pwrdm->prcm_partition,
-					pwrdm->prcm_offs,
-					pwrdm->pwrstctrl_offs);
+				pwrdm->prcm_offs, pwrdm->pwrstctrl_offs);
+				//	pwrdm->prcm_offs, OMAP4_PM_PWSTCTRL);
 	return 0;
 }
 
@@ -435,8 +435,7 @@ static int omap4_pwrdm_set_lowpwrstchange(struct powerdomain *pwrdm)
 	omap4_prminst_rmw_inst_reg_bits(OMAP4430_LOWPOWERSTATECHANGE_MASK,
 					(1 << OMAP4430_LOWPOWERSTATECHANGE_SHIFT),
 					pwrdm->prcm_partition,
-					pwrdm->prcm_offs,
-					pwrdm->pwrstctrl_offs);
+					pwrdm->prcm_offs, pwrdm->pwrstctrl_offs);
 	return 0;
 }
 
@@ -455,8 +454,8 @@ static int omap4_pwrdm_set_logic_retst(struct powerdomain *pwrdm, u8 pwrst)
 
 	v = pwrst << __ffs(OMAP4430_LOGICRETSTATE_MASK);
 	omap4_prminst_rmw_inst_reg_bits(OMAP4430_LOGICRETSTATE_MASK, v,
-					pwrdm->prcm_partition, pwrdm->prcm_offs,
-					pwrdm->pwrstctrl_offs);
+					pwrdm->prcm_partition,
+pwrdm->prcm_offs,pwrdm->pwrstctrl_offs);
 
 	return 0;
 }
@@ -562,7 +561,7 @@ static int omap4_pwrdm_read_mem_retst(struct powerdomain *pwrdm, u8 bank)
 	m = omap2_pwrdm_get_mem_bank_retst_mask(bank);
 
 	v = omap4_prminst_read_inst_reg(pwrdm->prcm_partition, pwrdm->prcm_offs,
-					pwrdm->pwrstctrl_offs);
+					pwrdm->pwrstst_offs);
 	v &= m;
 	v >>= __ffs(m);
 
@@ -634,30 +633,16 @@ struct pwrdm_ops omap4_pwrdm_operations = {
 	.pwrdm_read_prev_pwrst	= omap4_pwrdm_read_prev_pwrst,
 	.pwrdm_set_lowpwrstchange	= omap4_pwrdm_set_lowpwrstchange,
 	.pwrdm_clear_all_prev_pwrst	= omap4_pwrdm_clear_all_prev_pwrst,
-#if 0
-	.pwrdm_set_logic_retst	= omap4_pwrdm_set_logic_retst,
 	.pwrdm_read_logic_pwrst	= omap4_pwrdm_read_logic_pwrst,
+#if 0
 	.pwrdm_read_prev_logic_pwrst	= omap4_pwrdm_read_prev_logic_pwrst,
 #endif
 	.pwrdm_read_logic_retst	= omap4_pwrdm_read_logic_retst,
 	.pwrdm_read_mem_pwrst	= omap4_pwrdm_read_mem_pwrst,
 	.pwrdm_read_mem_retst	= omap4_pwrdm_read_mem_retst,
+#if 0
 	.pwrdm_read_prev_mem_pwrst	= omap4_pwrdm_read_prev_mem_pwrst,
-	.pwrdm_set_mem_onst	= omap4_pwrdm_set_mem_onst,
-	.pwrdm_set_mem_retst	= omap4_pwrdm_set_mem_retst,
-	.pwrdm_wait_transition	= omap4_pwrdm_wait_transition,
-};
-
-struct pwrdm_ops am33xx_pwrdm_operations = {
-	.pwrdm_set_next_pwrst	= omap4_pwrdm_set_next_pwrst,
-	.pwrdm_read_next_pwrst	= omap4_pwrdm_read_next_pwrst,
-	.pwrdm_read_pwrst	= omap4_pwrdm_read_pwrst,
-	.pwrdm_set_lowpwrstchange	= omap4_pwrdm_set_lowpwrstchange,
-	.pwrdm_set_logic_retst	= omap4_pwrdm_set_logic_retst,
-	.pwrdm_read_logic_pwrst	= omap4_pwrdm_read_logic_pwrst,
-	.pwrdm_read_logic_retst	= omap4_pwrdm_read_logic_retst,
-	.pwrdm_read_mem_pwrst	= omap4_pwrdm_read_mem_pwrst,
-	.pwrdm_read_mem_retst	= omap4_pwrdm_read_mem_retst,
+#endif
 	.pwrdm_set_mem_onst	= omap4_pwrdm_set_mem_onst,
 	.pwrdm_set_mem_retst	= omap4_pwrdm_set_mem_retst,
 	.pwrdm_wait_transition	= omap4_pwrdm_wait_transition,

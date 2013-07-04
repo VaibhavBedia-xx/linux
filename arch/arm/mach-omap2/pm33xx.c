@@ -69,11 +69,11 @@ struct wakeup_src wakeups[] = {
 };
 
 struct forced_standby_module am33xx_mod[] = {
+	{.oh_name = "cpgmac0"},
 	{.oh_name = "usb_otg_hs"},
 	{.oh_name = "tptc0"},
 	{.oh_name = "tptc1"},
 	{.oh_name = "tptc2"},
-	{.oh_name = "cpgmac0"},
 };
 
 static void __iomem *scu_base;
@@ -102,6 +102,7 @@ static int am33xx_pm_suspend(void)
 	struct platform_device *pdev;
 	struct omap_device *od;
 
+	pr_err("%s @ %d\n", __func__, __LINE__);
 	/*
 	 * By default the following IPs do not have MSTANDBY asserted
 	 * which is necessary for PER domain transition. If the drivers
@@ -110,53 +111,60 @@ static int am33xx_pm_suspend(void)
 	 * that there no issues with or without the drivers being compiled
 	 * in the kernel, we forcefully put these IPs to idle.
 	 */
-#if 0
-	for (i = 0; i < ARRAY_SIZE(am33xx_mod); i++) {
-		pdev = to_platform_device(am33xx_mod[i].dev);
-		od = to_omap_device(pdev);
-		if (od->_driver_status != BUS_NOTIFY_BOUND_DRIVER) {
-			omap_device_enable_hwmods(od);
-			omap_device_idle_hwmods(od);
+	if (soc_is_am33xx()) {
+		for (i = 0; i < ARRAY_SIZE(am33xx_mod); i++) {
+			pdev = to_platform_device(am33xx_mod[i].dev);
+			od = to_omap_device(pdev);
+			if (od->_driver_status != BUS_NOTIFY_BOUND_DRIVER) {
+				omap_device_enable_hwmods(od);
+				omap_device_idle_hwmods(od);
+			}
 		}
 	}
 
 	/* Try to put GFX to sleep */
-	omap_set_pwrdm_state(gfx_pwrdm, PWRDM_POWER_OFF);
-#endif
+	if (soc_is_am33xx())
+		omap_set_pwrdm_state(gfx_pwrdm, PWRDM_POWER_OFF);
+
 	if (soc_is_am43xx())
 		__raw_writel(0x03030303, scu_base + 0x8);
 
+	pr_err("%s @ %d\n", __func__, __LINE__);
 	ret = cpu_suspend(0, am33xx_do_sram_idle);
+	pr_err("%s @ %d\n", __func__, __LINE__);
 
 	omap_ctrl_writel(0x13, AM33XX_CONTROL_IPC_MSG_REG7);
-
 	if (soc_is_am43xx())
 		__raw_writel(0x03030300, scu_base + 0x8);
 
-#if 0
-	status = pwrdm_read_prev_pwrst(gfx_pwrdm);
-	if (status != PWRDM_POWER_OFF)
-		pr_err("GFX domain did not transition\n");
-	else
-		pr_info("GFX domain entered low power state\n");
+	if (soc_is_am33xx()) {
+		status = pwrdm_read_prev_pwrst(gfx_pwrdm);
+		if (status != PWRDM_POWER_OFF)
+			pr_err("GFX domain did not transition\n");
+		else
+			pr_info("GFX domain entered low power state\n");
+		/*
+		 * GFX_L4LS clock domain needs to be woken up to
+		 * ensure thet L4LS clock domain does not get stuck in transition
+		 * If that happens L3 module does not get disabled, thereby leading
+		 * to PER power domain transition failing
+		 *
+		 * The clock framework should take care of ensuring
+		 * that the clock domain is in the right state when
+		 * GFX driver is active.
+		 */
+		clkdm_wakeup(gfx_l4ls_clkdm);
+		clkdm_sleep(gfx_l4ls_clkdm);
+	}
 
-	/*
-	 * BUG: GFX_L4LS clock domain needs to be woken up to
-	 * ensure thet L4LS clock domain does not get stuck in transition
-	 * If that happens L3 module does not get disabled, thereby leading
-	 * to PER power domain transition failing
-	 */
-	clkdm_wakeup(gfx_l4ls_clkdm);
-	clkdm_sleep(gfx_l4ls_clkdm);
-#endif
 	if (ret) {
+	omap_ctrl_writel(0x14, AM33XX_CONTROL_IPC_MSG_REG7);
 		pr_err("Kernel suspend failure\n");
 	} else {
-		omap_ctrl_writel(0x14, AM33XX_CONTROL_IPC_MSG_REG7);
 		i = am33xx_pm_status();
 		switch (i) {
 		case 0:
-		omap_ctrl_writel(0x15, AM33XX_CONTROL_IPC_MSG_REG7);
+	omap_ctrl_writel(0x15, AM33XX_CONTROL_IPC_MSG_REG7);
 			pr_err("Successfully put all powerdomains to target state\n");
 			/*
 			 * XXX: Leads to loss of logic state in PER power domain
@@ -182,9 +190,8 @@ static int am33xx_pm_suspend(void)
 		}
 
 		if (j > ARRAY_SIZE(wakeups))
-			pr_info("Unknown wakeup source %d!!!\n", i);
+			pr_err("Unknown wakeup source %d!!!\n", i);
 	}
-
 	omap_ctrl_writel(0x16, AM33XX_CONTROL_IPC_MSG_REG7);
 
 	return ret;
@@ -211,11 +218,13 @@ static int am33xx_ping_wkup_m3(void)
 {
 	int ret = 0;
 
+	pr_err("%s @ %d\n", __func__, __LINE__);
 	omap_mbox_enable_irq(am33xx_pm->mbox, IRQ_RX);
 
 	ret = omap_mbox_msg_send(am33xx_pm->mbox, 0xABCDABCD);
 
 	omap_mbox_disable_irq(am33xx_pm->mbox, IRQ_RX);
+	pr_err("%s @ %d\n", __func__, __LINE__);
 
 	return ret;
 }
@@ -224,13 +233,14 @@ static void am33xx_m3_state_machine_reset(void)
 {
 	int i;
 
+	pr_err("%s @ %d\n", __func__, __LINE__);
 	am33xx_pm->ipc.sleep_mode = IPC_CMD_RESET;
 
 	am33xx_pm_ipc_cmd(&am33xx_pm->ipc);
 
 	am33xx_pm->state = M3_STATE_MSG_FOR_RESET;
 
-	pr_err("Sending message for resetting M3 state machine\n");
+	pr_info("Sending message for resetting M3 state machine\n");
 
 	if (!am33xx_ping_wkup_m3()) {
 		i = wait_for_completion_timeout(&am33xx_pm_sync,
@@ -238,6 +248,7 @@ static void am33xx_m3_state_machine_reset(void)
 		if (WARN(i == 0, "MPU<->CM3 sync failure"))
 			am33xx_pm->state = M3_STATE_UNKNOWN;
 	}
+	pr_err("%s @ %d\n", __func__, __LINE__);
 }
 
 static int am33xx_pm_begin(suspend_state_t state)
@@ -258,7 +269,7 @@ static int am33xx_pm_begin(suspend_state_t state)
 
 	if (!am33xx_ping_wkup_m3()) {
 		i = wait_for_completion_timeout(&am33xx_pm_sync,
-					msecs_to_jiffies(500));
+					msecs_to_jiffies(1000));
 		if (WARN(i == 0, "MPU<->CM3 sync failure"))
 			return -1;
 	}
@@ -268,6 +279,7 @@ static int am33xx_pm_begin(suspend_state_t state)
 
 static void am33xx_pm_end(void)
 {
+	pr_err("%s @ %d\n", __func__, __LINE__);
 	omap_ctrl_writel(0x17, AM33XX_CONTROL_IPC_MSG_REG7);
 	am33xx_m3_state_machine_reset();
 
@@ -285,7 +297,7 @@ static struct platform_suspend_ops am33xx_pm_ops = {
 
 /*
  * Dummy notifier for the mailbox
- * TODO: Get rid of this requirement once the MBX driver has been finalized
+ * XXX: Get rid of this requirement once the MBX driver has been finalized
  */
 static int wkup_mbox_msg(struct notifier_block *self, unsigned long len,
 		void *msg)
@@ -297,7 +309,8 @@ static struct notifier_block wkup_mbox_notifier = {
 	.notifier_call = wkup_mbox_msg,
 };
 
-/* TODO: register this as a callback from M3 IRQ */
+/* callback in IRQ context - can't sleep here */
+/* need to register it with the M3 code */
 int am33xx_txev_handler()
 {
 	int ret = 0;
@@ -421,29 +434,29 @@ int __init am33xx_pm_init(void)
 
 	if (!soc_is_am33xx() && !soc_is_am43xx())
 		return -ENODEV;
-
+	/* make it a warn so that we know it worked with quiet option */
 	pr_err("Power Management for AM33XX family\n");
 
-#if 0
 	/*
 	 * By default the following IPs do not have MSTANDBY asserted
 	 * which is necessary for PER domain transition. If the drivers
 	 * are not compiled into the kernel HWMOD code will not change the
 	 * state of the IPs if the IP was not never enabled
 	 */
-	for (i = 0; i < ARRAY_SIZE(am33xx_mod); i++)
-		am33xx_mod[i].dev = omap_device_get_by_hwmod_name(am33xx_mod[i].oh_name);
+	if (soc_is_am33xx()) {
+		for (i = 0; i < ARRAY_SIZE(am33xx_mod); i++)
+			am33xx_mod[i].dev = omap_device_get_by_hwmod_name(am33xx_mod[i].oh_name);
 
-	gfx_pwrdm = pwrdm_lookup("gfx_pwrdm");
-	per_pwrdm = pwrdm_lookup("per_pwrdm");
+		gfx_pwrdm = pwrdm_lookup("gfx_pwrdm");
+		per_pwrdm = pwrdm_lookup("per_pwrdm");
 
-	gfx_l4ls_clkdm = clkdm_lookup("gfx_l4ls_gfx_clkdm");
-
-	if ((!gfx_pwrdm) || (!per_pwrdm) || (!gfx_l4ls_clkdm)) {
-		ret = -ENODEV;
-		goto err;
+		gfx_l4ls_clkdm = clkdm_lookup("gfx_l4ls_gfx_clkdm");
+		if ((!gfx_pwrdm) || (!per_pwrdm) || (!gfx_l4ls_clkdm)) {
+			ret = -ENODEV;
+			goto err;
+		}
 	}
-#endif
+
 	am33xx_pm = kzalloc(sizeof(struct am33xx_pm_context), GFP_KERNEL);
 	if (!am33xx_pm) {
 		pr_err("Memory allocation failed\n");
@@ -493,7 +506,6 @@ int __init am33xx_pm_init(void)
 	else
 		pr_err("Failed to get cefuse_pwrdm\n");
 
-	/* TODO: get the wkup_m3 context pointer */
 #if 0
 	temp = wkup_m3_is_inited();
 #endif

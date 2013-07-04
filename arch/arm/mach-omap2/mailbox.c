@@ -129,6 +129,7 @@ static int omap2_mbox_fifo_needs_flush(struct omap_mbox *mbox)
 {
 	struct omap_mbox2_fifo *fifo =
 		&((struct omap_mbox2_priv *)mbox->priv)->tx_fifo;
+	printk("%s @ %d %d\n", __func__, __LINE__, mbox_read_reg(fifo->msg_stat));
 	return mbox_read_reg(fifo->msg_stat);
 }
 
@@ -136,6 +137,7 @@ static mbox_msg_t omap2_mbox_fifo_readback(struct omap_mbox *mbox)
 {
 	struct omap_mbox2_fifo *fifo =
 		&((struct omap_mbox2_priv *)mbox->priv)->tx_fifo;
+	printk("%s @ %d\n", __func__, __LINE__);
 	return (mbox_msg_t) mbox_read_reg(fifo->msg);
 }
 
@@ -200,6 +202,7 @@ static void omap2_mbox_save_ctx(struct omap_mbox *mbox)
 
 	for (i = 0; i < nr_regs; i++) {
 		p->ctx[i] = mbox_read_reg(i * sizeof(u32));
+		pr_info("%s: [%02x] %08x\n", __func__, i, p->ctx[i]);
 
 		dev_dbg(mbox->dev, "%s: [%02x] %08x\n", __func__,
 			i, p->ctx[i]);
@@ -220,6 +223,7 @@ static void omap2_mbox_restore_ctx(struct omap_mbox *mbox)
 
 	for (i = 0; i < nr_regs; i++) {
 		mbox_write_reg(p->ctx[i], i * sizeof(u32));
+		pr_info("%s: [%02x] %08x\n", __func__, i, p->ctx[i]);
 
 		dev_dbg(mbox->dev, "%s: [%02x] %08x\n", __func__,
 			i, p->ctx[i]);
@@ -428,6 +432,7 @@ static int omap2_mbox_probe(struct platform_device *pdev)
 #endif
 #if defined(CONFIG_SOC_AM33XX) || defined(CONFIG_SOC_AM43XX)
 	else if (soc_is_am33xx() || soc_is_am43xx()) {
+	printk("%s @ %d\n", __func__, __LINE__);
 		list = am33xx_mboxes;
 
 		list[0]->irq = platform_get_irq(pdev, 0);

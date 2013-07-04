@@ -144,7 +144,7 @@ DT_MACHINE_START(AM33XX_DT, "Generic AM33XX (Flattened Device Tree)")
 	.init_machine	= omap_generic_init,
 	.init_time	= omap3_gptimer_timer_init,
 	.dt_compat	= am33xx_boards_compat,
-	.restart	= am33xx_restart,
+	.restart	= omap44xx_restart,
 MACHINE_END
 #endif
 
@@ -195,6 +195,9 @@ static const char *am43_boards_compat[] __initdata = {
 
 DT_MACHINE_START(AM43_DT, "Generic AM43 (Flattened Device Tree)")
 	.reserve	= am33xx_reserve,
+#if 0
+	.smp		= smp_ops(omap4_smp_ops), /* needed to get scu mapped? */
+#endif
 	.map_io		= am33xx_map_io,
 	.init_early	= am43xx_init_early,
 	.init_late	= am33xx_init_late,

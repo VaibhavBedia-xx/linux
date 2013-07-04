@@ -578,6 +578,9 @@ void __init omap_clocks_register(struct omap_clk oclks[], int cnt)
 
 	for (c = oclks; c < oclks + cnt; c++) {
 		clkdev_add(&c->lk);
+#if 0
+	printk("%s @ %d %s\n", __func__, __LINE__, c->lk.clk->name);
+#endif
 		if (!__clk_init(NULL, c->lk.clk))
 			omap2_init_clk_hw_omap_clocks(c->lk.clk);
 	}

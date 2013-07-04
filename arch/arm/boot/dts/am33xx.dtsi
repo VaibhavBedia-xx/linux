@@ -75,11 +75,14 @@
 	 * the whole bus hierarchy.
 	 */
 	ocp {
-		compatible = "simple-bus";
+		compatible = "ti,omap4-l3-noc", "simple-bus";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges;
-		ti,hwmods = "l3_main";
+		ti,hwmods = "l3_main", "l3_s";
+		reg = <0x44000000 0x400000>,
+		      <0x44800000 0x400000>;
+		interrupts = <9 10>;
 
 		intc: interrupt-controller@48200000 {
 			compatible = "ti,omap2-intc";

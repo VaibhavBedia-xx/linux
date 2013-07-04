@@ -318,6 +318,7 @@ static void irq_save_context(void)
 {
 	if (soc_is_am43xx())
 		am43xx_irq_save_context();
+
 #if 0
 	if (!sar_base)
 		sar_base = omap4_get_sar_ram_base();
@@ -402,7 +403,8 @@ static void __init irq_hotplug_init(void)
 }
 #else
 static void __init irq_hotplug_init(void)
-{}
+{
+}
 #endif
 
 #ifdef CONFIG_CPU_PM
@@ -410,17 +412,22 @@ static int irq_notifier(struct notifier_block *self, unsigned long cmd,	void *v)
 {
 	switch (cmd) {
 	case CPU_CLUSTER_PM_ENTER:
-		if (omap_type() == OMAP2_DEVICE_TYPE_GP)
+		if (omap_type() == OMAP2_DEVICE_TYPE_GP) {
+	pr_err("%s @ %d\n", __func__, __LINE__);
 			irq_save_context();
-		else
+		} else {
+	pr_err("%s @ %d\n", __func__, __LINE__);
 			irq_save_secure_context();
+		}
 		break;
 	case CPU_CLUSTER_PM_EXIT:
-		if (omap_type() == OMAP2_DEVICE_TYPE_GP)
+		if (omap_type() == OMAP2_DEVICE_TYPE_GP) {
+	pr_err("%s @ %d\n", __func__, __LINE__);
 			irq_restore_context();
 #if 0
 			irq_sar_clear();
 #endif
+		}
 		break;
 	}
 	return NOTIFY_OK;
@@ -479,9 +486,7 @@ int __init omap_wakeupgen_init(void)
 	/* Clear all IRQ bitmasks at wakeupGen level */
 	for (i = 0; i < irq_banks; i++) {
 		wakeupgen_writel(0, i, CPU0_ID);
-#if 0
 		wakeupgen_writel(0, i, CPU1_ID);
-#endif
 	}
 
 	/*

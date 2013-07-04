@@ -51,6 +51,9 @@ int omap4_dpllmx_gatectrl_read(struct clk_hw_omap *clk)
 
 void omap4_dpllmx_allow_gatectrl(struct clk_hw_omap *clk)
 {
+#ifdef ZEBU
+	return;
+#endif
 	u32 v;
 	u32 mask;
 
@@ -69,6 +72,10 @@ void omap4_dpllmx_allow_gatectrl(struct clk_hw_omap *clk)
 
 void omap4_dpllmx_deny_gatectrl(struct clk_hw_omap *clk)
 {
+#ifdef ZEBU
+	return;
+#endif
+
 	u32 v;
 	u32 mask;
 

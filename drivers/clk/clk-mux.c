@@ -90,7 +90,6 @@ static int clk_mux_set_parent(struct clk_hw *hw, u8 index)
 	val &= ~(mux->mask << mux->shift);
 	val |= index << mux->shift;
 	writel(val, mux->reg);
-
 	if (mux->lock)
 		spin_unlock_irqrestore(mux->lock, flags);
 

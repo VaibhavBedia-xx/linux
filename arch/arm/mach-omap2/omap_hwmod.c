@@ -2088,13 +2088,13 @@ static int _enable(struct omap_hwmod *oh)
 		soc_ops.enable_module(oh);
 	if (oh->flags & HWMOD_BLOCK_WFI)
 		cpu_idle_poll_ctrl(true);
-#if 0
 	if (soc_ops.update_context_lost)
 		soc_ops.update_context_lost(oh);
 	r = (soc_ops.wait_target_ready) ? soc_ops.wait_target_ready(oh) :
 		-EINVAL;
-#endif
-       r = 0;
+
+	r = 0;
+
 	if (!r) {
 		/*
 		 * Set the clockdomain to HW_AUTO only if the target is ready,
@@ -2880,8 +2880,10 @@ static int _omap2_is_hardreset_asserted(struct omap_hwmod *oh,
 static int _omap4_assert_hardreset(struct omap_hwmod *oh,
 				   struct omap_hwmod_rst_info *ohri)
 {
+#if 0
 	if (!oh->clkdm)
 		return -EINVAL;
+#endif
 
 	return omap4_prminst_assert_hardreset(ohri->rst_shift,
 				oh->clkdm->pwrdm.ptr->prcm_partition,
@@ -2904,9 +2906,13 @@ static int _omap4_assert_hardreset(struct omap_hwmod *oh,
 static int _omap4_deassert_hardreset(struct omap_hwmod *oh,
 				     struct omap_hwmod_rst_info *ohri)
 {
+#if 0
 	if (!oh->clkdm)
 		return -EINVAL;
-
+	if (ohri->st_shift)
+		pr_info("omap_hwmod: %s: %s: hwmod data error: OMAP4 does not support st_shift\n",
+		       oh->name, ohri->name);
+#endif
 	return omap4_prminst_deassert_hardreset(ohri->rst_shift,
 				ohri->st_shift,
 				oh->clkdm->pwrdm.ptr->prcm_partition,
@@ -2930,9 +2936,10 @@ static int _omap4_deassert_hardreset(struct omap_hwmod *oh,
 static int _omap4_is_hardreset_asserted(struct omap_hwmod *oh,
 					struct omap_hwmod_rst_info *ohri)
 {
+#if 0
 	if (!oh->clkdm)
 		return -EINVAL;
-
+#endif
 	return omap4_prminst_is_hardreset_asserted(ohri->rst_shift,
 				oh->clkdm->pwrdm.ptr->prcm_partition,
 				oh->clkdm->pwrdm.ptr->prcm_offs,
@@ -3946,7 +3953,7 @@ void __init omap_hwmod_init(void)
 		soc_ops.assert_hardreset = _omap2_assert_hardreset;
 		soc_ops.deassert_hardreset = _omap2_deassert_hardreset;
 		soc_ops.is_hardreset_asserted = _omap2_is_hardreset_asserted;
-	} else if (cpu_is_omap44xx() || soc_is_omap54xx() || soc_is_am43xx()) {
+	} else if (cpu_is_omap44xx() || soc_is_omap54xx() || soc_is_am43xx() || soc_is_am33xx()) {
 		soc_ops.enable_module = _omap4_enable_module;
 		soc_ops.disable_module = _omap4_disable_module;
 		soc_ops.wait_target_ready = _omap4_wait_target_ready;
@@ -3954,16 +3961,10 @@ void __init omap_hwmod_init(void)
 		soc_ops.deassert_hardreset = _omap4_deassert_hardreset;
 		soc_ops.is_hardreset_asserted = _omap4_is_hardreset_asserted;
 		soc_ops.init_clkdm = _init_clkdm;
+#if 0
 		soc_ops.update_context_lost = _omap4_update_context_lost;
 		soc_ops.get_context_lost = _omap4_get_context_lost;
-	} else if (soc_is_am33xx()) {
-		soc_ops.enable_module = _omap4_enable_module;
-		soc_ops.disable_module = _omap4_disable_module;
-		soc_ops.wait_target_ready = _omap4_wait_target_ready;
-		soc_ops.assert_hardreset = _omap4_assert_hardreset;
-		soc_ops.deassert_hardreset = _omap4_deassert_hardreset;
-		soc_ops.is_hardreset_asserted = _omap4_is_hardreset_asserted;
-		soc_ops.init_clkdm = _init_clkdm;
+#endif
 	} else {
 		WARN(1, "omap_hwmod: unknown SoC type\n");
 	}

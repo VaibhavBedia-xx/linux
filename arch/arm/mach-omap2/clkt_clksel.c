@@ -305,6 +305,10 @@ u32 omap2_clksel_round_rate_div(struct clk_hw_omap *clk,
  */
 u8 omap2_clksel_find_parent_index(struct clk_hw *hw)
 {
+#ifdef ZEBU
+	return 0;	/* assuming that the parent is always at index 0 - dangerous */
+#endif
+
 	struct clk_hw_omap *clk = to_clk_hw_omap(hw);
 	const struct clksel *clks;
 	const struct clksel_rate *clkr;
@@ -355,6 +359,10 @@ u8 omap2_clksel_find_parent_index(struct clk_hw *hw)
  */
 unsigned long omap2_clksel_recalc(struct clk_hw *hw, unsigned long parent_rate)
 {
+#ifdef ZEBU
+	return parent_rate;
+#endif
+
 	unsigned long rate;
 	u32 div = 0;
 	struct clk_hw_omap *clk = to_clk_hw_omap(hw);
@@ -363,6 +371,13 @@ unsigned long omap2_clksel_recalc(struct clk_hw *hw, unsigned long parent_rate)
 		return 0;
 
 	div = _read_divisor(clk);
+#if 0
+	div = 1;
+	/* in zebu the PLLs are not modelled so the access to
+	 * the hw is going to fail, we need to workaround that
+	 * issue for now
+	 */
+#endif
 	if (!div)
 		rate = parent_rate;
 	else
@@ -456,6 +471,9 @@ int omap2_clksel_set_rate(struct clk_hw *hw, unsigned long rate,
  */
 int omap2_clksel_set_parent(struct clk_hw *hw, u8 field_val)
 {
+#ifdef ZEBU
+	return 0;
+#endif
 	struct clk_hw_omap *clk = to_clk_hw_omap(hw);
 
 	if (!clk->clksel || !clk->clksel_mask)

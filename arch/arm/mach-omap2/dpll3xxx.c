@@ -79,7 +79,7 @@ static int _omap3_wait_dpll_status(struct clk_hw_omap *clk, u8 state)
 	}
 
 	if (i == MAX_DPLL_WAIT_TRIES) {
-		printk(KERN_ERR "clock: %s failed transition to '%s'\n",
+		pr_warn("clock: %s failed transition to '%s'\n",
 		       clk_name, (state) ? "locked" : "bypassed");
 	} else {
 		pr_debug("clock: %s transition to '%s' in %d loops\n",
@@ -139,6 +139,10 @@ static u16 _omap3_dpll_compute_freqsel(struct clk_hw_omap *clk, u8 n)
  */
 static int _omap3_noncore_dpll_lock(struct clk_hw_omap *clk)
 {
+#ifdef ZEBU
+	return 0;
+#endif
+
 	const struct dpll_data *dd;
 	u8 ai;
 	u8 state = 1;
@@ -184,6 +188,9 @@ done:
  */
 static int _omap3_noncore_dpll_bypass(struct clk_hw_omap *clk)
 {
+#ifdef ZEBU
+	return 0;
+#endif
 	int r;
 	u8 ai;
 
@@ -216,6 +223,9 @@ static int _omap3_noncore_dpll_bypass(struct clk_hw_omap *clk)
  */
 static int _omap3_noncore_dpll_stop(struct clk_hw_omap *clk)
 {
+#ifdef ZEBU
+	return 0;
+#endif
 	u8 ai;
 
 	if (!(clk->dpll_data->modes & (1 << DPLL_LOW_POWER_STOP)))
@@ -636,6 +646,9 @@ void omap3_dpll_deny_idle(struct clk_hw_omap *clk)
 unsigned long omap3_clkoutx2_recalc(struct clk_hw *hw,
 				    unsigned long parent_rate)
 {
+#ifdef ZEBU
+	return 0;
+#endif
 	const struct dpll_data *dd;
 	unsigned long rate;
 	u32 v;

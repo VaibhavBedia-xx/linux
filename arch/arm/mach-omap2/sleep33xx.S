@@ -18,6 +18,10 @@
 #include <linux/ti_emif.h>
 #include <asm/memory.h>
 #include <asm/assembler.h>
+#if 0
+#include <asm/smp_scu.h>
+#include "common.h"
+#endif
 
 #include "cm33xx.h"
 #include "cm43xx.h"
@@ -94,6 +98,23 @@ ENTRY(am33xx_do_wfi)
  THUMB(	nop		)
 	.arm
 
+	/*
+	 * Switch the CPU from Symmetric Multiprocessing (SMP) mode
+	 * to AsymmetricMultiprocessing (AMP) mode by programming
+	 * the SCU power status to DORMANT or OFF mode.
+	 * This enables the CPU to be taken out of coherency by
+	 * preventing the CPU from receiving cache, TLB, or BTB
+	 * maintenance operations broadcast by other CPUs in the cluster.
+	 */
+#if 0
+	bl	am43xx_get_scu_base
+	ldr	r1, [r0, #0x4]
+	orr	r1, #0x03
+	str	r1, [r0, #0x4]
+	isb
+	dsb
+#endif
+
 	ldr	r0, emif_addr_virt
 	/* Save EMIF configuration */
 	ldr	r1, [r0, #EMIF_SDRAM_CONFIG]
@@ -155,8 +176,7 @@ wait_emif_disable:
 	 * to DISABLED
 	 */
 	ldr	r1, virt_mpu_clkctrl
-	ldr	r2, [r1]
-	bic	r2, r2, #0x03
+	mov	r2, #0x0
 	str	r2, [r1]
 
 	/* AM43xx requires CLKTRCTRL to be either SW_SLEEP
@@ -180,7 +200,6 @@ wait_emif_disable:
 	isb
 
 	wfi
-
 	/* NOPs to ensure the A8 pipeline is clean */
 	nop
 	nop
@@ -195,7 +214,6 @@ wait_emif_disable:
 	nop
 	nop
 	nop
-
 	nop
 	nop
 	nop
@@ -218,6 +236,10 @@ wait_emif_disable:
 	mov	r2, #0x02
 	str	r2, [r1]
 
+	/* do a read from PRCM to be sure it worked */
+	ldr	r1, prcm_base
+	ldr	r2, [r1]
+
 	/* Re-enable EMIF */
 	ldr	r1, virt_emif_clkctrl
 	mov	r2, #0x02
@@ -231,7 +253,7 @@ wait_emif_enable:
 	mov	r1, #0x5
 	str	r1, [r0]
 
- 	/* Disable EMIF self-refresh */
+	/* Disable EMIF self-refresh */
 	ldr	r0, emif_addr_virt
 	ldr	r1, [r0, #EMIF_POWER_MANAGEMENT_CONTROL]
 	bic	r1, r1, #LP_MODE_MASK
@@ -256,6 +278,15 @@ wait_emif_enable:
 	mcr	p15, 0, r0, c1, c0, 0
 	isb
 
+#if 0
+	bl	am43xx_get_scu_base
+	ldr	r1, [r0, #0x4]
+	bic	r1, r1, #0x03
+	str	r1, [r0, #0x4]
+	isb
+	dsb
+#endif
+
 	/* Kill some time for sanity to settle in */
 	mov r0, #0x1000
 wait_abt:
@@ -276,12 +307,12 @@ ENTRY(am33xx_resume_offset)
 	.word . - am33xx_do_wfi
 
 ENTRY(am33xx_resume_from_deep_sleep)
+	/* Re-enable EMIF */
 
 	ldr	r0, scratchpad
 	mov	r1, #0x10
 	str	r1, [r0]
 
-	/* Re-enable EMIF */
 	ldr	r0, phys_emif_clkctrl
 	mov	r1, #0x02
 	str	r1, [r0]
@@ -349,6 +380,14 @@ wait_resume:
 	mov	r1, #0x12
 	str	r1, [r0]
 
+#if 0
+before_resume:
+	mov	r0, #0x1
+	mov	r1, #0x2
+	mov	r2, #0x3
+	bl	before_resume
+#endif
+
 	/* We are back. Branch to the common CPU resume routine */
 	mov	r0, #0
 	ldr	pc, resume_addr
@@ -367,7 +406,6 @@ ddr_start:
 	.word	PAGE_OFFSET
 emif_phys_addr:
 	.word	AM33XX_EMIF_BASE
-
 prcm_base:
 	.word	AM43XX_PRM_REGADDR(0x0, 0x0)
 virt_mpu_clkstctrl:
@@ -379,7 +417,6 @@ virt_emif_clkctrl:
 phys_emif_clkctrl:
 	.word	(AM43XX_CM_BASE + AM43XX_CM_PER_INST + \
 		AM43XX_CM_PER_EMIF_CLKCTRL_OFFSET)
-
 #if 0
 virt_mpu_clkctrl:
 	.word	AM33XX_CM_MPU_MPU_CLKCTRL
@@ -393,6 +430,7 @@ scratchpad:
 	.word	0x44e11344
 scratchpad_virt:
 	.word	AM33XX_L4_WK_IO_ADDRESS(0x44e11344)
+
 module_disabled_val:
 	.word	0x30000
 

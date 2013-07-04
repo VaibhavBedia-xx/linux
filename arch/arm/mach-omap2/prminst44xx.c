@@ -19,10 +19,8 @@
 #include "iomap.h"
 #include "common.h"
 #include "prcm-common.h"
-#include "prm33xx.h"
 #include "prm44xx.h"
 #include "prminst44xx.h"
-#include "prm-regbits-33xx.h"
 #include "prm-regbits-44xx.h"
 #include "prcm44xx.h"
 #include "prcm_mpu44xx.h"
@@ -142,33 +140,27 @@ int omap4_prminst_deassert_hardreset(u8 shift, u8 st_shift, u8 part, s16 inst,
 				     u16 rstctrl_offs, u16 rstst_offs)
 {
 	int c;
-	u32 ctrl_mask = 1 << shift;
-	u32 st_mask;
-
-	if (!rstst_offs)
-		rstst_offs = rstctrl_offs + OMAP4_RST_CTRL_ST_OFFSET;
-
-	if (!st_shift) {
-		st_mask = 1 << shift;
-		st_shift = shift;
-	} else {
-		st_mask = 1 << st_shift;
-	}
+	u32 mask;
 
 	/* Check the current status to avoid de-asserting the line twice */
 	if (omap4_prminst_is_hardreset_asserted(shift, part, inst,
 						rstctrl_offs) == 0)
 		return -EEXIST;
 
+	mask = 1 << st_shift;
 
 	/* Clear the reset status by writing 1 to the status bit */
-	omap4_prminst_rmw_inst_reg_bits(0xffffffff, st_mask, part, inst,
+	omap4_prminst_rmw_inst_reg_bits(0xffffffff, mask, part, inst,
 					rstst_offs);
+
+	mask = 1 << shift;
 	/* de-assert the reset control line */
-	omap4_prminst_rmw_inst_reg_bits(ctrl_mask, 0, part, inst, rstctrl_offs);
+	omap4_prminst_rmw_inst_reg_bits(mask, 0, part, inst, rstctrl_offs);
+
+	mask = 1 << st_shift;
 	/* wait the status to be set */
-	omap_test_timeout(omap4_prminst_is_hardreset_asserted(st_shift, part,
-							inst, rstst_offs),
+	omap_test_timeout(omap4_prminst_is_hardreset_asserted(st_shift, part, inst,
+							      rstst_offs),
 			  MAX_MODULE_HARDRESET_WAIT, c);
 
 	return (c == MAX_MODULE_HARDRESET_WAIT) ? -EBUSY : 0;
@@ -191,22 +183,4 @@ void omap4_prminst_global_warm_sw_reset(void)
 	v = omap4_prminst_read_inst_reg(OMAP4430_PRM_PARTITION,
 				    OMAP4430_PRM_DEVICE_INST,
 				    OMAP4_PRM_RSTCTRL_OFFSET);
-}
-
-void am33xx_prminst_global_warm_sw_reset(void)
-{
-	u32 v;
-
-	v = omap4_prminst_read_inst_reg(AM33XX_PRM_PARTITION,
-				    AM33XX_PRM_DEVICE_MOD,
-				    AM33XX_PRM_RSTCTRL_OFFSET);
-	v |= AM33XX_GLOBAL_WARM_SW_RST_MASK;
-	omap4_prminst_write_inst_reg(v, AM33XX_PRM_PARTITION,
-				 AM33XX_PRM_DEVICE_MOD,
-				 AM33XX_PRM_RSTCTRL_OFFSET);
-
-	/* OCP barrier */
-	v = omap4_prminst_read_inst_reg(AM33XX_PRM_PARTITION,
-				    AM33XX_PRM_DEVICE_MOD,
-				    AM33XX_PRM_RSTCTRL_OFFSET);
 }

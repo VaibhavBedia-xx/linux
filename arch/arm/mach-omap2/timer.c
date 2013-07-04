@@ -128,6 +128,7 @@ static void omap_clkevt_suspend(struct clock_event_device *unused)
 	if (!oh)
 		return;
 
+	pr_err("%s @ %d\n", __func__, __LINE__);
 	__omap_dm_timer_stop(&clkev, 1, clkev.rate);
 	omap_hwmod_idle(oh);
 }
@@ -142,6 +143,7 @@ static void omap_clkevt_resume(struct clock_event_device *unused)
 	if (!oh)
 		return;
 
+	pr_err("%s @ %d\n", __func__, __LINE__);
 	omap_hwmod_enable(oh);
 	__omap_dm_timer_load_start(&clkev,
 			OMAP_TIMER_CTRL_ST | OMAP_TIMER_CTRL_AR, 0, 1);
@@ -624,7 +626,7 @@ OMAP_SYS_32K_TIMER_INIT(3_secure, 12, "secure_32k_fck", "ti,timer-secure",
 #if defined(CONFIG_SOC_AM43XX)
 OMAP_SYS_32K_TIMER_INIT(43, 1, "timer_sys_ck", "ti,timer-alwon",
 			2, "timer_sys_ck", NULL);
-#endif 
+#endif
 
 #if defined(CONFIG_ARCH_OMAP3) || defined(CONFIG_SOC_AM33XX)
 OMAP_SYS_GP_TIMER_INIT(3, 2, "timer_sys_ck", NULL,

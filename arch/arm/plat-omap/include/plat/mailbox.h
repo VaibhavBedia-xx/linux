@@ -96,6 +96,7 @@ static inline void omap_mbox_restore_ctx(struct omap_mbox *mbox)
 static inline void omap_mbox_enable_irq(struct omap_mbox *mbox,
 					omap_mbox_irq_t irq)
 {
+	pr_err("%s @ %d\n", __func__, __LINE__);
 	mbox->ops->enable_irq(mbox, irq);
 }
 

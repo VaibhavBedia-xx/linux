@@ -35,9 +35,9 @@ static struct powerdomain gfx_43xx_pwrdm = {
 	.name		  = "gfx_pwrdm",
 	.voltdm		  = { .name = "core" },
 	.prcm_offs	  = AM43XX_PRM_GFX_INST,
+	.pwrstctrl_offs		= OMAP4_PM_PWSTCTRL,
+	.pwrstst_offs	= OMAP4_PM_PWSTST,
 	.prcm_partition	  = AM43XX_PRM_PARTITION,
-	.pwrstctrl_offs	  = OMAP4_PM_PWSTCTRL,
-	.pwrstst_offs	  = OMAP4_PM_PWSTST,
 	.pwrsts		  = PWRSTS_OFF_ON,
 	.banks		  = 1,
 	.pwrsts_mem_ret	= {
@@ -55,9 +55,9 @@ static struct powerdomain mpu_43xx_pwrdm = {
 	.voltdm		  = { .name = "mpu" },
 	.prcm_offs	  = AM43XX_PRM_MPU_INST,
 	.prcm_partition	  = AM43XX_PRM_PARTITION,
-	.pwrstctrl_offs	  = OMAP4_PM_PWSTCTRL,
-	.pwrstst_offs	  = OMAP4_PM_PWSTST,
 	.pwrsts		  = PWRSTS_OFF_RET_ON,
+	.pwrstctrl_offs		= OMAP4_PM_PWSTCTRL,
+	.pwrstst_offs	= OMAP4_PM_PWSTST,
 	.pwrsts_logic_ret = PWRSTS_OFF_RET,
 	.banks		  = 3,
 	.pwrsts_mem_ret	= {
@@ -79,9 +79,9 @@ static struct powerdomain rtc_43xx_pwrdm = {
 	.voltdm		  = { .name = "rtc" },
 	.prcm_offs	  = AM43XX_PRM_RTC_INST,
 	.prcm_partition	  = AM43XX_PRM_PARTITION,
-	.pwrstctrl_offs	  = OMAP4_PM_PWSTCTRL,
-	.pwrstst_offs	  = OMAP4_PM_PWSTST,
 	.pwrsts		  = PWRSTS_ON,
+	.pwrstst_offs	= OMAP4_PM_PWSTST,
+	.pwrstctrl_offs		= OMAP4_PM_PWSTCTRL,
 };
 
 /* wkup_43xx_pwrdm: TBD */
@@ -90,8 +90,8 @@ static struct powerdomain wkup_43xx_pwrdm = {
 	.voltdm		  = { .name = "core" },
 	.prcm_offs	  = AM43XX_PRM_WKUP_INST,
 	.prcm_partition	  = AM43XX_PRM_PARTITION,
-	.pwrstctrl_offs	  = OMAP4_PM_PWSTCTRL,
-	.pwrstst_offs	  = OMAP4_PM_PWSTST,
+	.pwrstst_offs	= OMAP4_PM_PWSTST,
+	.pwrstctrl_offs		= OMAP4_PM_PWSTCTRL,
 	.pwrsts		  = PWRSTS_ON,
 	.banks		  = 1,
 	.pwrsts_mem_ret	= {
@@ -108,8 +108,8 @@ static struct powerdomain tamper_43xx_pwrdm = {
 	.voltdm		  = { .name = "tamper" },
 	.prcm_offs	  = AM43XX_PRM_TAMPER_INST,
 	.prcm_partition	  = AM43XX_PRM_PARTITION,
-	.pwrstctrl_offs	  = OMAP4_PM_PWSTCTRL,
-	.pwrstst_offs	  = OMAP4_PM_PWSTST,
+	.pwrstctrl_offs		= OMAP4_PM_PWSTCTRL,
+	.pwrstst_offs	= OMAP4_PM_PWSTST,
 	.pwrsts		  = PWRSTS_ON,
 };
 
@@ -119,9 +119,9 @@ static struct powerdomain cefuse_43xx_pwrdm = {
 	.voltdm		  = { .name = "core" },
 	.prcm_offs	  = AM43XX_PRM_CEFUSE_INST,
 	.prcm_partition	  = AM43XX_PRM_PARTITION,
-	.pwrstctrl_offs	  = OMAP4_PM_PWSTCTRL,
-	.pwrstst_offs	  = OMAP4_PM_PWSTST,
 	.pwrsts		  = PWRSTS_OFF_ON,
+	.pwrstst_offs	= OMAP4_PM_PWSTST,
+	.pwrstctrl_offs		= OMAP4_PM_PWSTCTRL,
 	.flags		  = PWRDM_HAS_LOWPOWERSTATECHANGE,
 };
 
@@ -131,9 +131,9 @@ static struct powerdomain per_43xx_pwrdm = {
 	.voltdm		  = { .name = "core" },
 	.prcm_offs	  = AM43XX_PRM_PER_INST,
 	.prcm_partition	  = AM43XX_PRM_PARTITION,
-	.pwrstctrl_offs	  = OMAP4_PM_PWSTCTRL,
-	.pwrstst_offs	  = OMAP4_PM_PWSTST,
+	.pwrstctrl_offs		= OMAP4_PM_PWSTCTRL,
 	.pwrsts		  = PWRSTS_OFF_RET_ON,
+	.pwrstst_offs	= OMAP4_PM_PWSTST,
 	.pwrsts_logic_ret = PWRSTS_OFF_RET,
 	.banks		  = 4,
 	.pwrsts_mem_ret	= {
@@ -150,12 +150,6 @@ static struct powerdomain per_43xx_pwrdm = {
 	},
 	.flags		  = PWRDM_HAS_LOWPOWERSTATECHANGE,
 };
-
-static int am43xx_check_vcvp(void)
-{
-       /* No VC/VP on am33xx devices */
-       return 0;
-}
 
 /*
  * The following power domains are not under SW control
@@ -177,8 +171,7 @@ static struct powerdomain *powerdomains_am43xx[] __initdata = {
 
 void __init am43xx_powerdomains_init(void)
 {
-	am33xx_pwrdm_operations.pwrdm_has_voltdm = am43xx_check_vcvp;
-	pwrdm_register_platform_funcs(&am33xx_pwrdm_operations);
+	pwrdm_register_platform_funcs(&omap4_pwrdm_operations);
 	pwrdm_register_pwrdms(powerdomains_am43xx);
 	pwrdm_complete_init();
 }

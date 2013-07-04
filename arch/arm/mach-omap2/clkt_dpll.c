@@ -188,6 +188,9 @@ static int _dpll_test_mult(int *m, int n, unsigned long *new_rate,
 /* Public functions */
 u8 omap2_init_dpll_parent(struct clk_hw *hw)
 {
+#ifdef ZEBU
+	return 0;
+#endif
 	struct clk_hw_omap *clk = to_clk_hw_omap(hw);
 	u32 v;
 	struct dpll_data *dd;
@@ -234,6 +237,9 @@ u8 omap2_init_dpll_parent(struct clk_hw *hw)
  */
 unsigned long omap2_get_dpll_rate(struct clk_hw_omap *clk)
 {
+#ifdef ZEBU
+	return 0;
+#endif
 	long long dpll_clk;
 	u32 dpll_mult, dpll_div, v;
 	struct dpll_data *dd;

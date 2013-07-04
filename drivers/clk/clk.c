@@ -782,7 +782,7 @@ static void __clk_disable(struct clk *clk)
 #else
 	if (clk->enable_count == 0)
 		return;
-#endif
+#endif 
 
 	if (--clk->enable_count > 0)
 		return;

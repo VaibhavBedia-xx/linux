@@ -38,13 +38,17 @@ unsigned int __init scu_get_core_count(void __iomem *scu_base)
 void scu_enable(void __iomem *scu_base)
 {
 	u32 scu_ctrl;
+	u32 ncores;
 
 #ifdef CONFIG_ARM_ERRATA_764369
 	/* Cortex-A9 only */
 	if ((read_cpuid_id() & 0xff0ffff0) == 0x410fc090) {
-		scu_ctrl = __raw_readl(scu_base + 0x30);
-		if (!(scu_ctrl & 1))
-			__raw_writel(scu_ctrl | 0x1, scu_base + 0x30);
+		ncores = (__raw_readl(scu_base + 0x04) & 0x3);
+		if (!ncores) {
+			scu_ctrl = __raw_readl(scu_base + 0x30);
+			if (!(scu_ctrl & 1))
+				__raw_writel(scu_ctrl | 0x1, scu_base + 0x30);
+		}
 	}
 #endif
 

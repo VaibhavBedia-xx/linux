@@ -201,9 +201,8 @@ static struct omap_hwmod_class_sysconfig am43xx_adc_tsc_sysc = {
 	.sysc_fields	= &omap_hwmod_sysc_type2,
 };
 
-
 static struct omap_hwmod_class am43xx_adc_tsc_hwmod_class = {
-	.name	= "adc_tsc",
+	.name		= "adc_tsc",
 	.sysc		= &am43xx_adc_tsc_sysc,
 };
 
@@ -249,6 +248,7 @@ static struct omap_hwmod_sysc_fields omap_hwmod_sysc_type_aes = {
 	.autoidle_shift	= 0,
 };
 
+/* checked the sysc from OMAP4 TRM - looks correct */
 static struct omap_hwmod_class_sysconfig am43xx_aes_sysc = {
 	.rev_offs	= 0x0080,
 	.sysc_offs	= 0x0084,
@@ -626,8 +626,8 @@ static struct omap_hwmod am43xx_emif_hwmod = {
 	.class		= &am43xx_emif_hwmod_class,
 	.clkdm_name	= "emif_clkdm",
 	.mpu_irqs	= am43xx_emif_irqs,
-	.main_clk	= "dpll_ddr_m4x2_ck",
 	.flags		= (HWMOD_INIT_NO_IDLE | HWMOD_INIT_NO_RESET),
+	.main_clk	= "dpll_ddr_m4x2_ck",
 	.prcm = {
 		.omap4 = {
 			.clkctrl_offs = AM43XX_CM_PER_EMIF_CLKCTRL_OFFSET,
@@ -1377,6 +1377,7 @@ static struct omap_hwmod_sysc_fields omap_hwmod_sysc_type_pka = {
 	.autoidle_shift	= 0,
 };
 
+/* fixed up sysc offset based on OMAP4 TRM */
 static struct omap_hwmod_class_sysconfig am43xx_pka_sysc = {
 	.rev_offs	= 0x1fe0,
 	.sysc_offs	= 0x1ff0,
@@ -1876,8 +1877,8 @@ static struct omap_hwmod am43xx_uart0_hwmod = {
 	.clkdm_name	= "l4_wkup_clkdm",
 	.mpu_irqs	= am43xx_uart0_irqs,
 	.sdma_reqs	= am43xx_uart0_sdma_reqs,
-	.flags		= (HWMOD_INIT_NO_IDLE | HWMOD_INIT_NO_RESET),
 	.main_clk	= "uart0_clk",
+	.flags		= (HWMOD_INIT_NO_IDLE | HWMOD_INIT_NO_RESET),
 	.prcm = {
 		.omap4 = {
 			.clkctrl_offs = AM43XX_CM_WKUP_UART0_CLKCTRL_OFFSET,
@@ -2362,7 +2363,7 @@ static struct omap_hwmod am43xx_tptc2_hwmod = {
 };
 
 /*
-  * Interfaces
+ * Interfaces
  */
 
 /* mpu -> l3 */
@@ -2894,6 +2895,7 @@ static struct omap_hwmod_addr_space am43xx_sha0_addr[] = {
 		.flags		= ADDR_TYPE_RT
 	},
 };
+
 /* l3 -> sha0 */
 static struct omap_hwmod_ocp_if am43xx_l3__sha0 = {
 	.master		= &am43xx_l3_hwmod,
@@ -3320,11 +3322,13 @@ static struct omap_hwmod_ocp_if *am43xx_hwmod_ocp_ifs[] __initdata = {
 	&am43xx_l4wkup__control,
 #if 0
 	&am43xx_l4ls__cryptodma,
-	&am43xx_l4ls__dss,
 #endif
 	&am43xx_l4ls__dcan0,
 	&am43xx_l4ls__dcan1,
 	&am43xx_l3__des,
+#if 0
+	&am43xx_l4ls__dss,	/* missing idle config? */
+#endif
 	&am43xx_l4ls__elm,
 	&am43xx_l4ls__epwmss1,
 	&am43xx_l4ls__epwmss2,
@@ -3362,9 +3366,7 @@ static struct omap_hwmod_ocp_if *am43xx_hwmod_ocp_ifs[] __initdata = {
 	&am43xx_l4wkup__smartreflex1,
 	&am43xx_l4ls__spinlock,
 	&am43xx_l4wkup__synctimer,
-#if 0
-	&am43xx_l4wkup__timer0,
-#endif
+//	&am43xx_l4wkup__timer0,
 	&am43xx_l4wkup__timer1,
 	&am43xx_l4ls__timer2,
 	&am43xx_l4ls__timer3,
@@ -3388,7 +3390,7 @@ static struct omap_hwmod_ocp_if *am43xx_hwmod_ocp_ifs[] __initdata = {
 	&am43xx_l4ls__usim1,
 	&am43xx_l4ls__vpfe0,
 	&am43xx_l4ls__vpfe1,
-	&am43xx_l4wkup__wdt0,
+//	&am43xx_l4wkup__wdt0,
 	&am43xx_l4wkup__wdt1,
 #endif
 	&am43xx_l4wkup__wkup_m3,

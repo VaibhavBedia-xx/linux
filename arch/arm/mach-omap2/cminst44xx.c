@@ -285,6 +285,10 @@ int omap4_cminst_wait_module_ready(u8 part, u16 inst, u16 cdoffs,
 {
 	int i = 0;
 
+#if 0
+	if (!clkctrl_offs)
+		return 0;
+#endif
 	omap_test_timeout(_is_module_ready(part, inst, cdoffs, clkctrl_offs),
 			  MAX_MODULE_READY_TIME, i);
 
@@ -306,6 +310,9 @@ int omap4_cminst_wait_module_ready(u8 part, u16 inst, u16 cdoffs,
 int omap4_cminst_wait_module_idle(u8 part, u16 inst, u16 cdoffs, u16 clkctrl_offs)
 {
 	int i = 0;
+
+	if (!clkctrl_offs)
+		return 0;
 
 	omap_test_timeout((_clkctrl_idlest(part, inst, cdoffs, clkctrl_offs) ==
 			   CLKCTRL_IDLEST_DISABLED),
@@ -455,6 +462,7 @@ static int omap4_clkdm_clk_disable(struct clockdomain *clkdm)
 	if (!clkdm->prcm_partition)
 		return 0;
 
+#if 0
 	/*
 	 * The CLKDM_MISSING_IDLE_REPORTING flag documentation has
 	 * more details on the unpleasant problem this is working
@@ -465,7 +473,7 @@ static int omap4_clkdm_clk_disable(struct clockdomain *clkdm)
 		omap4_clkdm_allow_idle(clkdm);
 		return 0;
 	}
-
+#endif
 	hwsup = omap4_cminst_is_clkdm_in_hwsup(clkdm->prcm_partition,
 					clkdm->cm_inst, clkdm->clkdm_offs);
 
@@ -495,6 +503,8 @@ struct clkdm_ops omap4_clkdm_operations = {
 struct clkdm_ops am33xx_clkdm_operations = {
 	.clkdm_sleep		= omap4_clkdm_sleep,
 	.clkdm_wakeup		= omap4_clkdm_wakeup,
+	.clkdm_allow_idle	= omap4_clkdm_allow_idle,
+	.clkdm_deny_idle	= omap4_clkdm_deny_idle,
 	.clkdm_clk_enable	= omap4_clkdm_clk_enable,
 	.clkdm_clk_disable	= omap4_clkdm_clk_disable,
 };

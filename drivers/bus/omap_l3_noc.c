@@ -91,6 +91,7 @@ static irqreturn_t l3_interrupt_handler(int irq, void *_l3)
 			case STANDARD_ERROR:
 				target_name =
 					l3_targ_inst_name[i][err_src];
+				//WARN(true, "L3 standard error: TARGET:%s at address 0x%x\n",
 				pr_err("L3 standard error: TARGET:%s at address 0x%x\n",
 					target_name,
 					__raw_readl(l3_targ_base +
@@ -109,6 +110,7 @@ static irqreturn_t l3_interrupt_handler(int irq, void *_l3)
 						master_name =
 							l3_masters[k].name;
 				}
+				//WARN(true, "L3 custom error: MASTER:%s TARGET:%s\n",
 				pr_err("L3 custom error: MASTER:%s TARGET:%s\n",
 					master_name, target_name);
 				/* clear the std error log*/
@@ -182,7 +184,6 @@ static int omap4_l3_probe(struct platform_device *pdev)
 		goto err2;
 	}
 #endif
-
 	/*
 	 * Setup interrupt Handlers
 	 */
@@ -194,6 +195,9 @@ static int omap4_l3_probe(struct platform_device *pdev)
 		pr_crit("L3: request_irq failed to register for 0x%x\n",
 						l3->debug_irq);
 		goto err2;
+#if 0
+		goto err3;
+#endif
 	}
 
 	l3->app_irq = platform_get_irq(pdev, 1);
