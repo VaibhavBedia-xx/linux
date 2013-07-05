@@ -163,13 +163,18 @@ void __iomem *omap4_get_l2cache_base(void)
 static void omap4_l2x0_disable(void)
 {
 	/* Disable PL310 L2 Cache controller */
-		omap_smc1(0x102, 0x0);
+	omap_smc1(0x102, 0x0);
 }
 
 static void omap4_l2x0_set_debug(unsigned long val)
 {
 	/* Program PL310 L2 Cache controller debug register */
-	if (!soc_is_am43xx())
+#if 0
+	if (!soc_is_am43xx())	/* this is most likely not needed since the corresponding erratum
+				 * is not applicable for this SoC version so we could skip it?
+				 * validate later
+				 */
+#endif
 		omap_smc1(0x100, val);
 }
 
@@ -177,12 +182,12 @@ static int __init omap_l2_cache_init(void)
 {
 	u32 aux_ctrl = 0;
 	u32 cr = 0x102;
-	u32 acr = 0x103;
+	u32 acr = 0x109;
 	/*
 	 * To avoid code running on other OMAPs in
 	 * multi-omap builds
 	 */
-	if (!cpu_is_omap44xx())
+	if (!cpu_is_omap44xx() && !soc_is_am43xx())
 		return -ENODEV;
 
 	/* Static mapping, never released */

@@ -486,7 +486,9 @@ int __init omap_wakeupgen_init(void)
 	/* Clear all IRQ bitmasks at wakeupGen level */
 	for (i = 0; i < irq_banks; i++) {
 		wakeupgen_writel(0, i, CPU0_ID);
+#if 0
 		wakeupgen_writel(0, i, CPU1_ID);
+#endif
 	}
 
 	/*

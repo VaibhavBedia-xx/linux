@@ -69,14 +69,17 @@ struct wakeup_src wakeups[] = {
 };
 
 struct forced_standby_module am33xx_mod[] = {
+#if 0
 	{.oh_name = "cpgmac0"},
 	{.oh_name = "usb_otg_hs"},
+#endif
 	{.oh_name = "tptc0"},
 	{.oh_name = "tptc1"},
 	{.oh_name = "tptc2"},
 };
 
 static void __iomem *scu_base;
+static void __iomem *l2_base;
 
 #ifdef CONFIG_SUSPEND
 
@@ -111,7 +114,7 @@ static int am33xx_pm_suspend(void)
 	 * that there no issues with or without the drivers being compiled
 	 * in the kernel, we forcefully put these IPs to idle.
 	 */
-	if (soc_is_am33xx()) {
+	if (soc_is_am33xx() || soc_is_am43xx()) {
 		for (i = 0; i < ARRAY_SIZE(am33xx_mod); i++) {
 			pdev = to_platform_device(am33xx_mod[i].dev);
 			od = to_omap_device(pdev);
@@ -129,9 +132,7 @@ static int am33xx_pm_suspend(void)
 	if (soc_is_am43xx())
 		__raw_writel(0x03030303, scu_base + 0x8);
 
-	pr_err("%s @ %d\n", __func__, __LINE__);
 	ret = cpu_suspend(0, am33xx_do_sram_idle);
-	pr_err("%s @ %d\n", __func__, __LINE__);
 
 	omap_ctrl_writel(0x13, AM33XX_CONTROL_IPC_MSG_REG7);
 	if (soc_is_am43xx())
@@ -159,13 +160,13 @@ static int am33xx_pm_suspend(void)
 
 	if (ret) {
 	omap_ctrl_writel(0x14, AM33XX_CONTROL_IPC_MSG_REG7);
-		pr_err("Kernel suspend failure\n");
+		pr_info("Kernel suspend failure\n");
 	} else {
 		i = am33xx_pm_status();
 		switch (i) {
 		case 0:
 	omap_ctrl_writel(0x15, AM33XX_CONTROL_IPC_MSG_REG7);
-			pr_err("Successfully put all powerdomains to target state\n");
+			pr_info("Successfully put all powerdomains to target state\n");
 			/*
 			 * XXX: Leads to loss of logic state in PER power domain
 			 * Use SOC specific ops for this?
@@ -184,7 +185,7 @@ static int am33xx_pm_suspend(void)
 		i = am33xx_pm_wake_src();
 		for (j = 0; j < ARRAY_SIZE(wakeups); j++) {
 			if (wakeups[j].irq_nr == i) {
-				pr_err("Wakeup src %s\n", wakeups[j].src);
+				pr_info("Wakeup src %s\n", wakeups[j].src);
 				break;
 			}
 		}
@@ -218,13 +219,11 @@ static int am33xx_ping_wkup_m3(void)
 {
 	int ret = 0;
 
-	pr_err("%s @ %d\n", __func__, __LINE__);
 	omap_mbox_enable_irq(am33xx_pm->mbox, IRQ_RX);
 
 	ret = omap_mbox_msg_send(am33xx_pm->mbox, 0xABCDABCD);
 
 	omap_mbox_disable_irq(am33xx_pm->mbox, IRQ_RX);
-	pr_err("%s @ %d\n", __func__, __LINE__);
 
 	return ret;
 }
@@ -233,7 +232,6 @@ static void am33xx_m3_state_machine_reset(void)
 {
 	int i;
 
-	pr_err("%s @ %d\n", __func__, __LINE__);
 	am33xx_pm->ipc.sleep_mode = IPC_CMD_RESET;
 
 	am33xx_pm_ipc_cmd(&am33xx_pm->ipc);
@@ -248,7 +246,6 @@ static void am33xx_m3_state_machine_reset(void)
 		if (WARN(i == 0, "MPU<->CM3 sync failure"))
 			am33xx_pm->state = M3_STATE_UNKNOWN;
 	}
-	pr_err("%s @ %d\n", __func__, __LINE__);
 }
 
 static int am33xx_pm_begin(suspend_state_t state)
@@ -265,7 +262,7 @@ static int am33xx_pm_begin(suspend_state_t state)
 
 	am33xx_pm->state = M3_STATE_MSG_FOR_LP;
 
-	pr_err("Sending message for entering DeepSleep mode\n");
+	pr_info("Sending message for entering DeepSleep mode\n");
 
 	if (!am33xx_ping_wkup_m3()) {
 		i = wait_for_completion_timeout(&am33xx_pm_sync,
@@ -279,7 +276,6 @@ static int am33xx_pm_begin(suspend_state_t state)
 
 static void am33xx_pm_end(void)
 {
-	pr_err("%s @ %d\n", __func__, __LINE__);
 	omap_ctrl_writel(0x17, AM33XX_CONTROL_IPC_MSG_REG7);
 	am33xx_m3_state_machine_reset();
 
@@ -425,6 +421,22 @@ static int __init am43xx_map_scu(void)
 	return 0;
 }
 
+/* SCU base address */
+void __iomem *am43xx_get_l2_base(void)
+{
+	return l2_base;
+}
+
+static int __init am43xx_map_l2(void)
+{
+	l2_base = ioremap(0x48242000, SZ_4K);
+
+	if (!l2_base)
+		return -ENOMEM;
+
+	return 0;
+}
+
 int __init am33xx_pm_init(void)
 {
 	int ret;
@@ -434,8 +446,8 @@ int __init am33xx_pm_init(void)
 
 	if (!soc_is_am33xx() && !soc_is_am43xx())
 		return -ENODEV;
-	/* make it a warn so that we know it worked with quiet option */
-	pr_err("Power Management for AM33XX family\n");
+
+	pr_info("Power Management for AM33XX family\n");
 
 	/*
 	 * By default the following IPs do not have MSTANDBY asserted
@@ -443,10 +455,12 @@ int __init am33xx_pm_init(void)
 	 * are not compiled into the kernel HWMOD code will not change the
 	 * state of the IPs if the IP was not never enabled
 	 */
-	if (soc_is_am33xx()) {
-		for (i = 0; i < ARRAY_SIZE(am33xx_mod); i++)
+	if (soc_is_am33xx() || soc_is_am43xx()) {
+		for (i = 0; i < ARRAY_SIZE(am33xx_mod); i++) {
 			am33xx_mod[i].dev = omap_device_get_by_hwmod_name(am33xx_mod[i].oh_name);
+		}
 
+#if 0
 		gfx_pwrdm = pwrdm_lookup("gfx_pwrdm");
 		per_pwrdm = pwrdm_lookup("per_pwrdm");
 
@@ -455,6 +469,7 @@ int __init am33xx_pm_init(void)
 			ret = -ENODEV;
 			goto err;
 		}
+#endif
 	}
 
 	am33xx_pm = kzalloc(sizeof(struct am33xx_pm_context), GFP_KERNEL);
@@ -470,6 +485,12 @@ int __init am33xx_pm_init(void)
 		goto err;
 	}
 
+	ret = am43xx_map_l2();
+	if (ret) {
+		pr_err("Could not ioremap PL310\n");
+		goto err;
+	}
+
 	ret = am33xx_map_emif();
 	if (ret) {
 		pr_err("Could not ioremap EMIF\n");
@@ -482,6 +503,7 @@ int __init am33xx_pm_init(void)
 		susp_params.emif_addr_virt = am33xx_emif_base;
 		susp_params.dram_sync = am33xx_dram_sync;
 		susp_params.mem_type = temp;
+		susp_params.l2_base_virt = l2_base;
 		am33xx_pm->ipc.param3 = temp;
 	}
 
@@ -510,7 +532,7 @@ int __init am33xx_pm_init(void)
 	temp = wkup_m3_is_inited();
 #endif
 
-	pr_err("Trying to load am335x-pm-firmware.bin");
+	pr_info("Trying to load am335x-pm-firmware.bin");
 
 	/* We don't want to delay boot */
 	request_firmware_nowait(THIS_MODULE, 0, "am335x-pm-firmware.bin",

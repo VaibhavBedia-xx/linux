@@ -39,6 +39,7 @@ struct am33xx_suspend_params {
 	void __iomem *emif_addr_virt;
 	u32 mem_type;
 	void __iomem *dram_sync;
+	void __iomem *l2_base_virt;
 };
 
 struct wakeup_src {
