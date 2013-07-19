@@ -33,23 +33,28 @@
 #include "omap4-sar-layout.h"
 #include "common.h"
 
-#define MAX_NR_REG_BANKS	5
-#define MAX_IRQS		160
+/* 224 interrupts on AM43XX */
+#define MAX_NR_REG_BANKS	7
+#define NR_IRQS_PER_BANK	32
+#define MAX_IRQS		(MAX_NR_REG_BANKS * NR_IRQS_PER_BANK)
 #define WKG_MASK_ALL		0x00000000
 #define WKG_UNMASK_ALL		0xffffffff
 #define CPU_ENA_OFFSET		0x400
 #define CPU0_ID			0x0
 #define CPU1_ID			0x1
+
 #define OMAP4_NR_BANKS		4
-#define OMAP4_NR_IRQS		128
+#define OMAP5_NR_BANKS		5
+#define AM43XX_NR_BANKS		7
 
 static void __iomem *wakeupgen_base;
 static void __iomem *sar_base;
 static DEFINE_RAW_SPINLOCK(wakeupgen_lock);
-static unsigned int irq_target_cpu[MAX_IRQS];
 static unsigned int irq_banks = MAX_NR_REG_BANKS;
-static unsigned int max_irqs = MAX_IRQS;
+static unsigned int max_irqs;
+static unsigned int irq_target_cpu[MAX_IRQS];
 static unsigned int omap_secure_apis;
+static unsigned int wakeupgen_context[MAX_NR_REG_BANKS];
 
 /*
  * Static helper functions.
@@ -272,6 +277,17 @@ static inline void omap5_irq_save_context(void)
 
 }
 
+static inline void am43xx_irq_save_context(void)
+{
+	u32 i, val;
+
+	for (i = 0; i < irq_banks; i++) {
+		wakeupgen_context[i] = wakeupgen_readl(i, 0);
+		/* TODO: Skip clearing off wakeupgen bits? */
+		wakeupgen_writel(0, i, CPU0_ID);
+	}
+}
+
 /*
  * Save WakeupGen interrupt context in SAR BANK3. Restore is done by
  * ROM code. WakeupGen IP is integrated along with GIC to manage the
@@ -282,13 +298,18 @@ static inline void omap5_irq_save_context(void)
  */
 static void irq_save_context(void)
 {
+	/* TODO: Redundant check? */
+#if 0
 	if (!sar_base)
 		sar_base = omap4_get_sar_ram_base();
+#endif
 
 	if (soc_is_omap54xx())
 		omap5_irq_save_context();
-	else
+	else if (cpu_is_omap44xx())
 		omap4_irq_save_context();
+	else if (soc_is_am43xx())
+		am43xx_irq_save_context();
 }
 
 /*
@@ -305,6 +326,23 @@ static void irq_sar_clear(void)
 	val = __raw_readl(sar_base + offset);
 	val &= ~SAR_BACKUP_STATUS_WAKEUPGEN;
 	__raw_writel(val, sar_base + offset);
+}
+
+static void am43xx_irq_restore_context(void)
+{
+	u32 i;
+
+	for (i = 0; i < irq_banks; i++)
+		wakeupgen_writel(wakeupgen_context[i], i, CPU0_ID);
+}
+
+
+static void irq_restore_context(void)
+{
+	if (cpu_is_omap44xx() || soc_is_omap54xx())
+		irq_sar_clear();
+	else if (soc_is_am43xx())
+		am43xx_irq_restore_context();
 }
 
 /*
@@ -364,7 +402,7 @@ static int irq_notifier(struct notifier_block *self, unsigned long cmd,	void *v)
 		break;
 	case CPU_CLUSTER_PM_EXIT:
 		if (omap_type() == OMAP2_DEVICE_TYPE_GP)
-			irq_sar_clear();
+			irq_restore_context();
 		break;
 	}
 	return NOTIFY_OK;
@@ -416,14 +454,21 @@ int __init omap_wakeupgen_init(void)
 
 	if (cpu_is_omap44xx()) {
 		irq_banks = OMAP4_NR_BANKS;
-		max_irqs = OMAP4_NR_IRQS;
 		omap_secure_apis = 1;
+	} else if (soc_is_omap54xx()) {
+		irq_banks = OMAP5_NR_BANKS;
+	} else if (soc_is_am43xx()) {
+		irq_banks = AM43XX_NR_BANKS;
 	}
+
+	max_irqs = (irq_banks * NR_IRQS_PER_BANK);
 
 	/* Clear all IRQ bitmasks at wakeupGen level */
 	for (i = 0; i < irq_banks; i++) {
 		wakeupgen_writel(0, i, CPU0_ID);
-		wakeupgen_writel(0, i, CPU1_ID);
+		/* TODO: Check #cores */
+		if (!soc_is_am43xx())
+			wakeupgen_writel(0, i, CPU1_ID);
 	}
 
 	/*
