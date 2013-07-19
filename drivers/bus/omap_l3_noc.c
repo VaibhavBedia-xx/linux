@@ -91,7 +91,8 @@ static irqreturn_t l3_interrupt_handler(int irq, void *_l3)
 			case STANDARD_ERROR:
 				target_name =
 					l3_targ_inst_name[i][err_src];
-				WARN(true, "L3 standard error: TARGET:%s at address 0x%x\n",
+				//WARN(true, "L3 standard error: TARGET:%s at address 0x%x\n",
+				pr_err("L3 standard error: TARGET:%s at address 0x%x\n",
 					target_name,
 					__raw_readl(l3_targ_base +
 						L3_TARG_STDERRLOG_SLVOFSLSB));
@@ -109,7 +110,8 @@ static irqreturn_t l3_interrupt_handler(int irq, void *_l3)
 						master_name =
 							l3_masters[k].name;
 				}
-				WARN(true, "L3 custom error: MASTER:%s TARGET:%s\n",
+				//WARN(true, "L3 custom error: MASTER:%s TARGET:%s\n",
+				pr_err("L3 custom error: MASTER:%s TARGET:%s\n",
 					master_name, target_name);
 				/* clear the std error log*/
 				clear = std_err_main | CLEAR_STDERR_LOG;

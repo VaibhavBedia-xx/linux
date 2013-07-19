@@ -79,7 +79,7 @@ static int _omap3_wait_dpll_status(struct clk_hw_omap *clk, u8 state)
 	}
 
 	if (i == MAX_DPLL_WAIT_TRIES) {
-		printk(KERN_ERR "clock: %s failed transition to '%s'\n",
+		pr_warn("clock: %s failed transition to '%s'\n",
 		       clk_name, (state) ? "locked" : "bypassed");
 	} else {
 		pr_debug("clock: %s transition to '%s' in %d loops\n",
