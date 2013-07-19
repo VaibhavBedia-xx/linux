@@ -28,6 +28,7 @@
 #include "prcm44xx.h"
 #include "prm-regbits-43xx.h"
 #include "prm43xx.h"
+#include "prm44xx.h"
 
 /* gfx_43xx_pwrdm:  */
 static struct powerdomain gfx_43xx_pwrdm = {
@@ -36,6 +37,8 @@ static struct powerdomain gfx_43xx_pwrdm = {
 	.prcm_offs	  = AM43XX_PRM_GFX_INST,
 	.prcm_partition	  = AM43XX_PRM_PARTITION,
 	.pwrsts		  = PWRSTS_OFF_ON,
+	.pwrstctrl_offs   = OMAP4_PM_PWSTCTRL,
+	.pwrstst_offs     = OMAP4_PM_PWSTST,
 	.banks		  = 1,
 	.pwrsts_mem_ret	= {
 		[0] = PWRSTS_OFF_RET,	/* gfx_mem */
@@ -54,6 +57,8 @@ static struct powerdomain mpu_43xx_pwrdm = {
 	.prcm_partition	  = AM43XX_PRM_PARTITION,
 	.pwrsts		  = PWRSTS_OFF_RET_ON,
 	.pwrsts_logic_ret = PWRSTS_OFF_RET,
+	.pwrstctrl_offs	  = OMAP4_PM_PWSTCTRL,
+	.pwrstst_offs	  = OMAP4_PM_PWSTST,
 	.banks		  = 3,
 	.pwrsts_mem_ret	= {
 		[0] = PWRSTS_OFF_RET,	/* mpu_l1 */
@@ -75,6 +80,8 @@ static struct powerdomain rtc_43xx_pwrdm = {
 	.prcm_offs	  = AM43XX_PRM_RTC_INST,
 	.prcm_partition	  = AM43XX_PRM_PARTITION,
 	.pwrsts		  = PWRSTS_ON,
+	.pwrstst_offs	  = OMAP4_PM_PWSTST,
+	.pwrstctrl_offs	  = OMAP4_PM_PWSTCTRL,
 };
 
 /* wkup_43xx_pwrdm: TBD */
@@ -84,6 +91,8 @@ static struct powerdomain wkup_43xx_pwrdm = {
 	.prcm_offs	  = AM43XX_PRM_WKUP_INST,
 	.prcm_partition	  = AM43XX_PRM_PARTITION,
 	.pwrsts		  = PWRSTS_ON,
+	.pwrstst_offs	  = OMAP4_PM_PWSTST,
+	.pwrstctrl_offs	  = OMAP4_PM_PWSTCTRL,
 	.banks		  = 1,
 	.pwrsts_mem_ret	= {
 		[0] = PWRSTS_OFF,	/* debugss_mem */
@@ -100,6 +109,8 @@ static struct powerdomain tamper_43xx_pwrdm = {
 	.prcm_offs	  = AM43XX_PRM_TAMPER_INST,
 	.prcm_partition	  = AM43XX_PRM_PARTITION,
 	.pwrsts		  = PWRSTS_ON,
+	.pwrstctrl_offs	  = OMAP4_PM_PWSTCTRL,
+	.pwrstst_offs	  = OMAP4_PM_PWSTST,
 };
 
 /* cefuse_43xx_pwrdm:  */
@@ -109,6 +120,8 @@ static struct powerdomain cefuse_43xx_pwrdm = {
 	.prcm_offs	  = AM43XX_PRM_CEFUSE_INST,
 	.prcm_partition	  = AM43XX_PRM_PARTITION,
 	.pwrsts		  = PWRSTS_OFF_ON,
+	.pwrstst_offs	  = OMAP4_PM_PWSTST,
+	.pwrstctrl_offs	  = OMAP4_PM_PWSTCTRL,
 	.flags		  = PWRDM_HAS_LOWPOWERSTATECHANGE,
 };
 
@@ -120,6 +133,8 @@ static struct powerdomain per_43xx_pwrdm = {
 	.prcm_partition	  = AM43XX_PRM_PARTITION,
 	.pwrsts		  = PWRSTS_OFF_RET_ON,
 	.pwrsts_logic_ret = PWRSTS_OFF_RET,
+	.pwrstctrl_offs	  = OMAP4_PM_PWSTCTRL,
+	.pwrstst_offs	  = OMAP4_PM_PWSTST,
 	.banks		  = 4,
 	.pwrsts_mem_ret	= {
 		[0] = PWRSTS_OFF_RET,	/* icss_mem */
