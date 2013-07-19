@@ -588,14 +588,16 @@ void __init am33xx_init_early(void)
 	omap_hwmod_init_postsetup();
 	omap_clk_init = am33xx_clk_init;
 }
+#endif
 
+#if defined(CONFIG_SOC_AM33XX) || defined(CONFIG_SOC_AM43XX)
 void __init am33xx_init_late(void)
 {
 	am33xx_pm_init();
 }
 #endif
 
-#ifdef CONFIG_SOC_AM43XX
+#ifdef CONFIG_SOC_AM33XX
 void __init am43xx_init_early(void)
 {
 	omap2_set_globals_tap(AM335X_CLASS,
@@ -608,6 +610,7 @@ void __init am43xx_init_early(void)
         omap_cm_base_init();
 	omap3xxx_check_revision();
 	ti81xx_check_features();
+	omap44xx_prm_init();
 	am43xx_powerdomains_init();
 	am43xx_clockdomains_init();
 	am43xx_hwmod_init();
