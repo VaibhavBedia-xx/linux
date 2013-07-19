@@ -157,7 +157,7 @@ static void omap2_mbox_disable_irq(struct omap_mbox *mbox,
 	struct omap_mbox2_priv *p = mbox->priv;
 	u32 bit = (irq == IRQ_TX) ? p->notfull_bit : p->newmsg_bit;
 
-	if (!cpu_is_omap44xx() || !soc_is_am33xx())
+	if (!cpu_is_omap44xx() || !soc_is_am33xx() || !soc_is_am43xx())
 		bit = mbox_read_reg(p->irqdisable) & ~bit;
 
 	mbox_write_reg(bit, p->irqdisable);
@@ -193,7 +193,7 @@ static void omap2_mbox_save_ctx(struct omap_mbox *mbox)
 	int nr_regs;
 	if (cpu_is_omap44xx())
 		nr_regs = OMAP4_MBOX_NR_REGS;
-	else if (soc_is_am33xx())
+	else if (soc_is_am33xx() || soc_is_am43xx())
 		nr_regs = AM33XX_MBOX_NR_REGS;
 	else
 		nr_regs = MBOX_NR_REGS;
@@ -213,7 +213,7 @@ static void omap2_mbox_restore_ctx(struct omap_mbox *mbox)
 	int nr_regs;
 	if (cpu_is_omap44xx())
 		nr_regs = OMAP4_MBOX_NR_REGS;
-	else if (soc_is_am33xx())
+	else if (soc_is_am33xx() || soc_is_am43xx())
 		nr_regs = AM33XX_MBOX_NR_REGS;
 	else
 		nr_regs = MBOX_NR_REGS;
@@ -366,7 +366,7 @@ struct omap_mbox mbox_2_info = {
 struct omap_mbox *omap4_mboxes[] = { &mbox_1_info, &mbox_2_info, NULL };
 #endif
 
-#if defined(CONFIG_SOC_AM33XX)
+#if defined(CONFIG_SOC_AM33XX) || defined(CONFIG_SOC_AM43XX)
 static struct omap_mbox2_priv omap2_mbox_wkup_m3_priv = {
 	.tx_fifo = {
 		.msg		= MAILBOX_MESSAGE(0),
@@ -426,8 +426,8 @@ static int omap2_mbox_probe(struct platform_device *pdev)
 		list[0]->irq = list[1]->irq = platform_get_irq(pdev, 0);
 	}
 #endif
-#if defined(CONFIG_SOC_AM33XX)
-	else if (soc_is_am33xx()) {
+#if defined(CONFIG_SOC_AM33XX) || defined(CONFIG_SOC_AM43XX)
+	else if (soc_is_am33xx() || soc_is_am43xx()) {
 		list = am33xx_mboxes;
 
 		list[0]->irq = platform_get_irq(pdev, 0);
