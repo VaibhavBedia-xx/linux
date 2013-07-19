@@ -227,7 +227,7 @@ static struct omap_hwmod_sysc_fields omap_hwmod_sysc_type_aes = {
 };
 
 static struct omap_hwmod_class_sysconfig am43xx_aes_sysc = {
-	.rev_offs	= 0x100080,
+	.rev_offs	= 0x0080,
 	.sysc_offs	= 0x0084,
 	.syss_offs	= 0x0088,
 	.sysc_flags	= (SYSC_HAS_AUTOIDLE | SYSC_HAS_SIDLEMODE |
@@ -248,6 +248,7 @@ static struct omap_hwmod am43xx_aes0_hwmod = {
 	.class		= &am43xx_aes_hwmod_class,
 	.clkdm_name	= "l3_clkdm",
 	.main_clk	= "sysclk_div",
+	.flags		= HWMOD_SWSUP_SIDLE,
 	.prcm = {
 		.omap4 = {
 			.clkctrl_offs = AM43XX_CM_PER_AES0_CLKCTRL_OFFSET,
