@@ -155,6 +155,7 @@ config SOC_AM33XX
 config SOC_AM43XX
 	bool "TI AM43XX"
 	depends on ARCH_OMAP2PLUS
+	depends on ARCH_MULTI_V7
 	default y
 	select CPU_V7
 	select MULTI_IRQ_HANDLER
