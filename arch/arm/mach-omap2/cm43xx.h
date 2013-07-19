@@ -26,7 +26,7 @@
 #define AM43XX_CM_BASE		0x44df0000
 
 #define AM43XX_CM_REGADDR(inst, reg)				\
-	OMAP2_L4_WK_IO_ADDRESS(AM43XX_CM_BASE + (inst) + (reg))
+	AM33XX_L4_WK_IO_ADDRESS(AM43XX_CM_BASE + (inst) + (reg))
 
 /* CM instances */
 #define AM43XX_CM_WKUP_INST	0x2800
@@ -474,8 +474,10 @@
 #define AM43XX_CM_PER_OCPWP_CLKCTRL			AM43XX_CM_REGADDR(AM43XX_CM_PER_INST, 0x0c20)
 
 /* Function prototypes */
+#ifndef __ASSEMBLER__
 extern u32 omap4_cm1_read_inst_reg(s16 inst, u16 idx);
 extern void omap4_cm1_write_inst_reg(u32 val, s16 inst, u16 idx);
 extern u32 omap4_cm1_rmw_inst_reg_bits(u32 mask, u32 bits, s16 inst, s16 idx);
+#endif
 
 #endif
