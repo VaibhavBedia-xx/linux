@@ -27,7 +27,7 @@
 #define AM43XX_PRM_BASE		0x44df0000
 
 #define AM43XX_PRM_REGADDR(inst, reg)				\
-	OMAP2_L4_WK_IO_ADDRESS(AM43XX_PRM_BASE + (inst) + (reg))
+	AM33XX_L4_WK_IO_ADDRESS(AM43XX_PRM_BASE + (inst) + (reg))
 
 
 /* PRM instances */
