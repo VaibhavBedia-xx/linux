@@ -23,7 +23,6 @@
 
 static struct powerdomain gfx_33xx_pwrdm = {
 	.name			= "gfx_pwrdm",
-	.voltdm			= { .name = "core" },
 	.prcm_partition		= AM33XX_PRM_PARTITION,
 	.prcm_offs		= AM33XX_PRM_GFX_MOD,
 	.pwrstctrl_offs		= AM33XX_PM_GFX_PWRSTCTRL_OFFSET,
@@ -55,7 +54,6 @@ static struct powerdomain gfx_33xx_pwrdm = {
 
 static struct powerdomain rtc_33xx_pwrdm = {
 	.name			= "rtc_pwrdm",
-	.voltdm			= { .name = "rtc" },
 	.prcm_partition		= AM33XX_PRM_PARTITION,
 	.prcm_offs		= AM33XX_PRM_RTC_MOD,
 	.pwrstctrl_offs		= AM33XX_PM_RTC_PWRSTCTRL_OFFSET,
@@ -66,7 +64,6 @@ static struct powerdomain rtc_33xx_pwrdm = {
 
 static struct powerdomain wkup_33xx_pwrdm = {
 	.name			= "wkup_pwrdm",
-	.voltdm			= { .name = "core" },
 	.prcm_partition		= AM33XX_PRM_PARTITION,
 	.prcm_offs		= AM33XX_PRM_WKUP_MOD,
 	.pwrstctrl_offs		= AM33XX_PM_WKUP_PWRSTCTRL_OFFSET,
@@ -77,7 +74,6 @@ static struct powerdomain wkup_33xx_pwrdm = {
 
 static struct powerdomain per_33xx_pwrdm = {
 	.name			= "per_pwrdm",
-	.voltdm			= { .name = "core" },
 	.prcm_partition		= AM33XX_PRM_PARTITION,
 	.prcm_offs		= AM33XX_PRM_PER_MOD,
 	.pwrstctrl_offs		= AM33XX_PM_PER_PWRSTCTRL_OFFSET,
@@ -121,7 +117,6 @@ static struct powerdomain per_33xx_pwrdm = {
 
 static struct powerdomain mpu_33xx_pwrdm = {
 	.name			= "mpu_pwrdm",
-	.voltdm			= { .name = "mpu" },
 	.prcm_partition		= AM33XX_PRM_PARTITION,
 	.prcm_offs		= AM33XX_PRM_MPU_MOD,
 	.pwrstctrl_offs		= AM33XX_PM_MPU_PWRSTCTRL_OFFSET,
@@ -165,7 +160,6 @@ static struct powerdomain mpu_33xx_pwrdm = {
 
 static struct powerdomain cefuse_33xx_pwrdm = {
 	.name		= "cefuse_pwrdm",
-	.voltdm		= { .name = "core" },
 	.prcm_partition	= AM33XX_PRM_PARTITION,
 	.prcm_offs	= AM33XX_PRM_CEFUSE_MOD,
 	.pwrstctrl_offs	= AM33XX_PM_CEFUSE_PWRSTCTRL_OFFSET,
@@ -183,8 +177,15 @@ static struct powerdomain *powerdomains_am33xx[] __initdata = {
 	NULL,
 };
 
+static int am33xx_check_vcvp(void)
+{
+       /* No VC/VP on am33xx devices */
+       return 0;
+}
+
 void __init am33xx_powerdomains_init(void)
 {
+	am33xx_pwrdm_operations.pwrdm_has_voltdm = am33xx_check_vcvp;
 	pwrdm_register_platform_funcs(&am33xx_pwrdm_operations);
 	pwrdm_register_pwrdms(powerdomains_am33xx);
 	pwrdm_complete_init();
