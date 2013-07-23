@@ -49,7 +49,8 @@ int wkup_m3_copy_code(const u8 *data, size_t size)
 	return 0;
 }
 
-extern int am33xx_txev_handler();
+extern int am33xx_txev_handler(void);
+
 /* have platforms do what they want in atomic context over here? */
 static irqreturn_t wkup_m3_txev_handler(int irq, void *unused)
 {
@@ -130,7 +131,7 @@ err:
 
 static int wkup_m3_remove(struct platform_device *pdev)
 {
-
+	return 0;
 }
 
 static struct of_device_id wkup_m3_dt_ids[] = {

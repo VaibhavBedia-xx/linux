@@ -39,6 +39,8 @@ struct am33xx_suspend_params {
 	void __iomem *emif_addr_virt;
 	u32 mem_type;
 	void __iomem *dram_sync;
+	void __iomem *l2_base_virt;
+	u32 cpu_id;
 };
 
 struct wakeup_src {
@@ -47,12 +49,12 @@ struct wakeup_src {
 };
 
 struct forced_standby_module {
-	char oh_name[15];
+	char *oh_name;
 	struct device *dev;
 };
 
 int wkup_m3_copy_code(const u8 *data, size_t size);
-int wkup_m3_prepare();
+int wkup_m3_prepare(void);
 
 #endif
 

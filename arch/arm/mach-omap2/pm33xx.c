@@ -34,6 +34,7 @@
 #include <asm/sizes.h>
 #include <asm/fncpy.h>
 #include <asm/system_misc.h>
+#include <asm/smp_scu.h>
 
 #include "pm.h"
 #include "cm33xx.h"
@@ -44,11 +45,12 @@
 #include "powerdomain.h"
 #include "omap_hwmod.h"
 #include "omap_device.h"
+#include "omap44xx.h"
 #include "soc.h"
 #include "sram.h"
 
-static void __iomem *am33xx_emif_base;
-static struct powerdomain *cefuse_pwrdm, *gfx_pwrdm, *per_pwrdm;
+static void __iomem *am33xx_emif_base, *scu_base;
+static struct powerdomain *cefuse_pwrdm, *gfx_pwrdm;
 static struct clockdomain *gfx_l4ls_clkdm;
 
 struct wakeup_src wakeups[] = {
@@ -67,12 +69,27 @@ struct wakeup_src wakeups[] = {
 	{.irq_nr = 51,	.src = "ADC_TSC"},
 };
 
+/*
+ * By default the following IPs do not have MSTANDBY asserted
+ * which is necessary for PER domain transition. Iff the drivers
+ * are not compiled into the kernel we need to ask the OMAP PM f/w
+ * to put these IPs to FORCE_STANDBY before attempting a low power
+ * state.
+ */
+struct forced_standby_module am43xx_mod[] = {
+	{.oh_name = "tptc0"},
+	{.oh_name = "tptc1"},
+	{.oh_name = "tptc2"},
+	{.oh_name = NULL},
+};
+
 struct forced_standby_module am33xx_mod[] = {
 	{.oh_name = "usb_otg_hs"},
 	{.oh_name = "tptc0"},
 	{.oh_name = "tptc1"},
 	{.oh_name = "tptc2"},
 	{.oh_name = "cpgmac0"},
+	{.oh_name = NULL},
 };
 
 #ifdef CONFIG_SUSPEND
@@ -91,49 +108,55 @@ static int am33xx_do_sram_idle(long unsigned int unused)
 	return 0;
 }
 
-static int am33xx_pm_suspend(void)
+static void force_standby(struct forced_standby_module *mod)
 {
-	int i, j, ret = 0;
-
-	int status = 0;
 	struct platform_device *pdev;
 	struct omap_device *od;
+	int i = 0;
 
-	/*
-	 * By default the following IPs do not have MSTANDBY asserted
-	 * which is necessary for PER domain transition. If the drivers
-	 * are not compiled into the kernel HWMOD code will not change the
-	 * state of the IPs if the IP was not never enabled. To ensure
-	 * that there no issues with or without the drivers being compiled
-	 * in the kernel, we forcefully put these IPs to idle.
-	 */
-	for (i = 0; i < ARRAY_SIZE(am33xx_mod); i++) {
-		pdev = to_platform_device(am33xx_mod[i].dev);
+	do {
+		pdev = to_platform_device(mod[i++].dev);
 		od = to_omap_device(pdev);
 		if (od->_driver_status != BUS_NOTIFY_BOUND_DRIVER) {
 			omap_device_enable_hwmods(od);
 			omap_device_idle_hwmods(od);
 		}
+	} while (mod[i].oh_name != NULL);
+}
+
+static int am33xx_pm_suspend(void)
+{
+	int i, j, ret = 0;
+
+	if (soc_is_am33xx()) {
+		force_standby(am33xx_mod);
+		omap_set_pwrdm_state(gfx_pwrdm, PWRDM_POWER_OFF);
+	} else if (soc_is_am43xx()) {
+		force_standby(am43xx_mod);
+		scu_power_mode(scu_base, SCU_PM_POWEROFF);
 	}
 
-	/* Try to put GFX to sleep */
-	omap_set_pwrdm_state(gfx_pwrdm, PWRDM_POWER_OFF);
 	ret = cpu_suspend(0, am33xx_do_sram_idle);
 
-	status = pwrdm_read_prev_pwrst(gfx_pwrdm);
-	if (status != PWRDM_POWER_OFF)
-		pr_err("GFX domain did not transition\n");
-	else
-		pr_info("GFX domain entered low power state\n");
+	/* Set CPU Powerstate back to NORMAL in SCU */
+	if (soc_is_am43xx())
+		scu_power_mode(scu_base, SCU_PM_NORMAL);
 
-	/*
-	 * BUG: GFX_L4LS clock domain needs to be woken up to
-	 * ensure thet L4LS clock domain does not get stuck in transition
-	 * If that happens L3 module does not get disabled, thereby leading
-	 * to PER power domain transition failing
-	 */
-	clkdm_wakeup(gfx_l4ls_clkdm);
-	clkdm_sleep(gfx_l4ls_clkdm);
+	if (soc_is_am33xx()) {
+		i = pwrdm_read_prev_pwrst(gfx_pwrdm);
+		if (i != PWRDM_POWER_OFF)
+			pr_err("GFX domain did not transition\n");
+		else
+			pr_info("GFX domain entered low power state\n");
+		/*
+		 * BUG: GFX_L4LS clock domain needs to be woken up to
+		 * ensure thet L4LS clock domain does not get stuck in transition
+		 * If that happens L3 module does not get disabled, thereby leading
+		 * to PER power domain transition failing
+		 */
+		clkdm_wakeup(gfx_l4ls_clkdm);
+		clkdm_sleep(gfx_l4ls_clkdm);
+	}
 
 	if (ret) {
 		pr_err("Kernel suspend failure\n");
@@ -156,7 +179,6 @@ static int am33xx_pm_suspend(void)
 			ret = -1;
 		}
 
-		/* print the wakeup reason */
 		i = am33xx_pm_wake_src();
 		for (j = 0; j < ARRAY_SIZE(wakeups); j++) {
 			if (wakeups[j].irq_nr == i) {
@@ -166,7 +188,7 @@ static int am33xx_pm_suspend(void)
 		}
 
 		if (j > ARRAY_SIZE(wakeups))
-			pr_info("Unknown wakeup source %d!!!\n", i);
+			pr_err("Unknown wakeup source %d!!!\n", i);
 	}
 
 	return ret;
@@ -212,7 +234,7 @@ static void am33xx_m3_state_machine_reset(void)
 
 	am33xx_pm->state = M3_STATE_MSG_FOR_RESET;
 
-	pr_info("Sending message for resetting M3 state machine\n");
+	pr_debug("Sending message for resetting M3 state machine\n");
 
 	if (!am33xx_ping_wkup_m3()) {
 		i = wait_for_completion_timeout(&am33xx_pm_sync,
@@ -236,7 +258,7 @@ static int am33xx_pm_begin(suspend_state_t state)
 
 	am33xx_pm->state = M3_STATE_MSG_FOR_LP;
 
-	pr_info("Sending message for entering DeepSleep mode\n");
+	pr_debug("Sending message for entering DeepSleep mode\n");
 
 	if (!am33xx_ping_wkup_m3()) {
 		i = wait_for_completion_timeout(&am33xx_pm_sync,
@@ -278,8 +300,9 @@ static struct notifier_block wkup_mbox_notifier = {
 	.notifier_call = wkup_mbox_msg,
 };
 
-/* TODO: register this as a callback from M3 IRQ */
-int am33xx_txev_handler()
+/* callback in IRQ context - can't sleep here */
+/* need to register it with the M3 code */
+int am33xx_txev_handler(void)
 {
 	int ret = 0;
 
@@ -377,35 +400,54 @@ static int __init am33xx_map_emif(void)
 	return 0;
 }
 
+static int __init am43xx_map_scu(void)
+{
+	scu_base = ioremap(scu_a9_get_base(), SZ_256);
+
+	if (!scu_base)
+		return -ENOMEM;
+
+	return 0;
+}
+
 int __init am33xx_pm_init(void)
 {
-	int ret;
+	int i, ret;
 	u32 temp;
 	struct device_node *np;
-	int i;
 
-	if (!soc_is_am33xx())
+	if (!soc_is_am33xx() && !soc_is_am43xx())
 		return -ENODEV;
 
 	pr_info("Power Management for AM33XX family\n");
 
-	/*
-	 * By default the following IPs do not have MSTANDBY asserted
-	 * which is necessary for PER domain transition. If the drivers
-	 * are not compiled into the kernel HWMOD code will not change the
-	 * state of the IPs if the IP was not never enabled
-	 */
-	for (i = 0; i < ARRAY_SIZE(am33xx_mod); i++)
-		am33xx_mod[i].dev = omap_device_get_by_hwmod_name(am33xx_mod[i].oh_name);
+	if (soc_is_am33xx()) {
+		for (i = 0; i < ARRAY_SIZE(am33xx_mod) - 1; i++)
+			am33xx_mod[i].dev = omap_device_get_by_hwmod_name(am33xx_mod[i].oh_name);
 
-	gfx_pwrdm = pwrdm_lookup("gfx_pwrdm");
-	per_pwrdm = pwrdm_lookup("per_pwrdm");
+		gfx_pwrdm = pwrdm_lookup("gfx_pwrdm");
 
-	gfx_l4ls_clkdm = clkdm_lookup("gfx_l4ls_gfx_clkdm");
+		gfx_l4ls_clkdm = clkdm_lookup("gfx_l4ls_gfx_clkdm");
 
-	if ((!gfx_pwrdm) || (!per_pwrdm) || (!gfx_l4ls_clkdm)) {
-		ret = -ENODEV;
-		goto err;
+		if ((!gfx_pwrdm) || (!gfx_l4ls_clkdm)) {
+			ret = -ENODEV;
+			goto err;
+		}
+		susp_params.cpu_id = 0x1;
+	}
+
+	if (soc_is_am43xx()) {
+		for (i = 0; i < ARRAY_SIZE(am43xx_mod) - 1; i++)
+			am43xx_mod[i].dev = omap_device_get_by_hwmod_name(am43xx_mod[i].oh_name);
+
+		ret = am43xx_map_scu();
+		if (ret) {
+			pr_err("Could not ioremap SCU\n");
+			goto err;
+		}
+
+		susp_params.l2_base_virt = omap4_get_l2cache_base();
+		susp_params.cpu_id = 0x2;
 	}
 
 	am33xx_pm = kzalloc(sizeof(struct am33xx_pm_context), GFP_KERNEL);
@@ -451,7 +493,6 @@ int __init am33xx_pm_init(void)
 	else
 		pr_err("Failed to get cefuse_pwrdm\n");
 
-	/* TODO: get the wkup_m3 context pointer */
 #if 0
 	temp = wkup_m3_is_inited();
 #endif
